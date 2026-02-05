@@ -29,3 +29,9 @@ project.assets.json
 # Ignore VS-generated service dependency files
 serviceDependencies.local.json
 serviceDependencies.*.json
+
+# GitHub Copilot files
+.copilot
+CopilotIndices/
+CodeChunks.db*
+Semantic Symbols.db*

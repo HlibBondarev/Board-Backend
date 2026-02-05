@@ -1,0 +1,31 @@
+[Dd]ebug/
+[Rr]elease/
+.cache
+*.obj
+*.pdb
+*.suo
+*.user
+*.userprefs
+*.log
+*.pid
+*.mode
+*.lock-wsl
+
+# Visual Studio Publish Profiles
+*.pubxml
+*.pubxml.user
+
+# ARM template parameters, if generated
+*.arm.json
+
+# NET Core & NuGet
+[Bb]in/
+[Oo]bj/
+*.dgspec.json
+*.g.props
+*.g.targets
+project.assets.json
+
+# Ignore VS-generated service dependency files
+serviceDependencies.local.json
+serviceDependencies.*.json

@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Board.WepAPI", "Board.WepAP
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Board.WebApi.Tests", "Board.WebApi.Tests\Board.WebApi.Tests.csproj", "{645ECB99-2F59-1D99-EB5A-5E92E5F04B7C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Board.DataAccess", "Board.DataAccess\Board.DataAccess.csproj", "{A4A379F2-A0A4-4F1F-8C97-AD1CE3DEBEED}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{645ECB99-2F59-1D99-EB5A-5E92E5F04B7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{645ECB99-2F59-1D99-EB5A-5E92E5F04B7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{645ECB99-2F59-1D99-EB5A-5E92E5F04B7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4A379F2-A0A4-4F1F-8C97-AD1CE3DEBEED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4A379F2-A0A4-4F1F-8C97-AD1CE3DEBEED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4A379F2-A0A4-4F1F-8C97-AD1CE3DEBEED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4A379F2-A0A4-4F1F-8C97-AD1CE3DEBEED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

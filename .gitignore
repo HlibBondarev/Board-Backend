@@ -35,3 +35,5 @@ serviceDependencies.*.json
 CopilotIndices/
 CodeChunks.db*
 Semantic Symbols.db*
+
+.vs/

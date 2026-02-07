@@ -1,11 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Board.DataAccess.Models.Base;
+using System.ComponentModel.DataAnnotations;
 
 namespace Board.DataAccess.Models;
 
 // Class for the Task entity
-public class Issue
+public class Issue : IKeyedEntity<int>
 {
-    public int Id { get; set; } // Task ID
+    public int Id { get; init; } // Task ID
 
     [StringLength(200, MinimumLength = 3)]
     public required string Title { get; set; } // Task title (from 3 to 200 characters)

@@ -4,10 +4,16 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>0eab0b96-142d-4c36-aad7-72acb6e6dc9f</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.12" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.12.35" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Board.DataAccess\Board.DataAccess.csproj" />
   </ItemGroup>
 
 </Project>

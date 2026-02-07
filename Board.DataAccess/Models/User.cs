@@ -1,13 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Board.DataAccess.Models.Base;
+using System.ComponentModel.DataAnnotations;
 
 namespace Board.DataAccess.Models;
 
 // Class for the User entity
-public class User
+public class User : IKeyedEntity<int>
 {
-    public int Id { get; set; } // Unique identifier (Primary Key)
-    public required string Email { get; set; } // Email from OAuth
-
+    public int Id { get; init; }
+    public required string Email { get; set; }
     [StringLength(20, MinimumLength = 3)]
-    public required string DisplayName { get; set; } // Username (from 3 to 20 characters)
+    public required string DisplayName { get; set; }
 }

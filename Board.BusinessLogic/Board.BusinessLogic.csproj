@@ -27,7 +27,10 @@
   <ItemGroup>
     <Folder Include="Features\ForColumn\" />
     <Folder Include="Features\ForIssue\" />
-    <Folder Include="Features\ForUser\Handlers\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Features\ForUser\Commands\CreateUserCommand.cs" />
   </ItemGroup>
 
 </Project>

@@ -9,7 +9,7 @@ public class Column : IKeyedEntity<int>
     public int Id { get; init; } // Status ID
 
     [StringLength(20)]
-    public required string Name { get; set; } = null!;// Column name (e.g., "In Progress", up to 20 characters)
+    public string Name { get; set; } = null!;// Column name (e.g., "In Progress", up to 20 characters)
 
-    public required int Position { get; set; } // Display order (1, 2, 3...)
+    public int Position { get; set; } // Display order (1, 2, 3...)
 }

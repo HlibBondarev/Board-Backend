@@ -4,14 +4,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Board.BusinessLogic.Features.ForUser.Commands;
 
-public record Update(
-    [Required]
-    int Id,
-
+public record CreateUserCommand(
     [Required]
     [EmailAddress]
     string Email,
 
     [Required]
     [StringLength(20, MinimumLength = 3)]
-    string DisplayName) : IRequest<UserResponseDto>;
+    string DisplayName
+) : IRequest<UserResponseDto>;

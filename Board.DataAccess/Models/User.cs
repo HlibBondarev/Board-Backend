@@ -3,11 +3,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Board.DataAccess.Models;
 
-// Class for the User entity
 public class User : IKeyedEntity<int>
 {
     public int Id { get; init; }
-    public required string Email { get; set; }
+
+    public string Email { get; set; } = null!;
+
     [StringLength(20, MinimumLength = 3)]
-    public required string DisplayName { get; set; }
+    public string DisplayName { get; set; } = null!;
 }

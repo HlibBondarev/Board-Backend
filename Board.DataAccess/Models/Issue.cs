@@ -9,10 +9,10 @@ public class Issue : IKeyedEntity<int>
     public int Id { get; init; } // Task ID
 
     [StringLength(200, MinimumLength = 3)]
-    public required string Title { get; set; } // Task title (from 3 to 200 characters)
+    public string Title { get; set; } = null!;// Task title (from 3 to 200 characters)
 
     [StringLength(2000, MinimumLength = 10)]
-    public required string Description { get; set; } // Detailed text (from 10 to 2000 characters)
+    public string Description { get; set; } = null!; // Detailed text (from 10 to 2000 characters)
 
     [DataType(DataType.Date)]
     [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]

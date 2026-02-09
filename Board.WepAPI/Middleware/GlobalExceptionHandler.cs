@@ -1,4 +1,4 @@
-﻿using Board.WepAPI.Exceptions;
+﻿using Board.Common.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -29,6 +29,9 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
 
             ArgumentException ex => (StatusCodes.Status400BadRequest,
                 string.IsNullOrWhiteSpace(ex.Message) ? "Validation error. Please check your input data and try again." : ex.Message),
+
+            KeyNotFoundException ex => (StatusCodes.Status404NotFound,
+                string.IsNullOrWhiteSpace(ex.Message) ? "No entity with this Id was found." : ex.Message),
 
             // Security & Permissions (401->403)
             UnauthorizedAccessException => (StatusCodes.Status401Unauthorized,

@@ -1,4 +1,5 @@
-﻿using Board.DataAccess.Repository.Base;
+﻿using Board.BusinessLogic.Features;
+using Board.DataAccess.Repository.Base;
 using Board.WepAPI.Middleware;
 using Scalar.AspNetCore;
 using Serilog;
@@ -28,6 +29,8 @@ public static class Startup
 
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         services.AddOpenApi();
+
+        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(SqlStatements).Assembly));
 
         services.AddControllers();
 

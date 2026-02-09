@@ -21,32 +21,38 @@ public static class SqlStatements
     public static class ForColumns
     {
         public const string Create =
-            @"XXXXX";
+            @"EXEC dbo.Column_Post @Name = @Name, @Position = @Position";
         public const string GetById =
             @"EXEC dbo.Column_GetSingle @Id = @Id";
         public const string GetAll =
              @"dbo.Column_GetAll";
         public const string Any =
-            @"XXXXX";
+            @"dbo.Column_Any";
         public const string Update =
-            @"XXXXX";
+            @"EXEC dbo.Column_Put @Id = @Id, @Name = @Name, @Position = @Position";
         public const string Delete =
-            @"XXXXX";
+           @"EXEC dbo.Column_Delete @Id = @Id";
     }
 
     public static class ForIssues
     {
-        public const string Create =
-            @"XXXXX";
+        public const string Create = @"EXEC dbo.Issue_Post 
+            @Title = @Title, @Description = @Description,
+            @DueDate = @DueDate, @ColumnId = @ColumnId,
+            @CreatedAt = @CreatedAt, @CreatorId = @CreatorId,
+            @AssigneeId = @AssigneeId";
         public const string GetById =
             @"EXEC dbo.Issue_GetSingle @Id = @Id";
         public const string GetAll =
              @"dbo.Issue_GetAll";
         public const string Any =
-            @"XXXXX";
-        public const string Update =
-            @"XXXXX";
+            @"dbo.Issue_Any";
+        public const string Update = @"EXEC dbo.Issue_Put 
+            @Title = @Title, @Description = @Description,
+            @DueDate = @DueDate, @ColumnId = @ColumnId,
+            @CreatedAt = @CreatedAt, @CreatorId = @CreatorId,
+            @AssigneeId = @AssigneeId";
         public const string Delete =
-            @"XXXXX";
+            @"EXEC dbo.Issue_Delete @Id = @Id";
     }
 }

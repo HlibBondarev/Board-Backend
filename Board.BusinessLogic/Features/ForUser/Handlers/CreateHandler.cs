@@ -15,10 +15,11 @@ public class CreateHandler(IEntityRepositoryBase<int, User> repository,
 
     public async Task<UserResponseDto> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Start creating User in UpdateHandler.");
+        _logger.LogInformation("Start creating {User} in UpdateHandler.", typeof(User).Name);
         var user = new User { Email = request.Email, DisplayName = request.DisplayName };
         var result = await _repository.Create(user, SqlStatements.ForUsers.Create);
-        _logger.LogInformation("Successfully completed creating User with {Id} in EntityRepository.", result.Id);
+        _logger.LogInformation("Successfully completed creating {User} with {Id} in EntityRepository.",
+            typeof(User).Name, result.Id);
 
         return result.ToDto();
     }

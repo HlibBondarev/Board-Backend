@@ -15,10 +15,11 @@ public class CreateHandler(IEntityRepositoryBase<int, Column> repository,
 
     public async Task<ColumnResponseDto> Handle(CreateColumnCommand request, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Start creating Column in UpdateHandler.");
+        _logger.LogInformation("Start creating {Column} in UpdateHandler.", typeof(Column).Name);
         var column = new Column { Name = request.Name, Position = request.Position };
         var result = await _repository.Create(column, SqlStatements.ForColumns.Create);
-        _logger.LogInformation("Successfully completed creating Column with {Id} in EntityRepository.", result.Id);
+        _logger.LogInformation("Successfully completed creating {Column} with {Id} in EntityRepository.",
+            typeof(Column).Name, result.Id);
 
         return result.ToDto();
     }

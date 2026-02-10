@@ -51,7 +51,7 @@ public class EntityRepositoryBase<TKey, TEntity>(IConfiguration configuration) :
             sql,
             new { Id = id }
         );
-        _ = entity ?? throw new NotFoundException($"Entity with Id = {id} not found");
+        _ = entity ?? throw new NotFoundException($"{typeof(TEntity).Name} with Id = {id} not found");
 
         return entity;
     }

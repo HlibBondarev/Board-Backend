@@ -16,10 +16,10 @@ public class GetAllHandler(IEntityRepositoryBase<int, Column> repository,
 
     public async Task<IEnumerable<ColumnResponseDto>> Handle(GetAllColumnQuery request, CancellationToken ct)
     {
-        _logger.LogInformation("Start executing GetAllQuery for Columns in UpdateHandler.");
+        _logger.LogInformation("Start executing GetAllQuery for {Column}s in UpdateHandler.", typeof(Column).Name);
         var columns = await _repository.GetAll(SqlStatements.ForColumns.GetAll);
         _ = columns ?? throw new NotFoundException($"No columns found");
-        _logger.LogInformation("Successfully completed executing GetAllQuery for Columns in EntityRepository.");
+        _logger.LogInformation("Successfully completed executing GetAllQuery for {Column}s in EntityRepository.", typeof(Column).Name);
 
         return columns.ToDto();
     }

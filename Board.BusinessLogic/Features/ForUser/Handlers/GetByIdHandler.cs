@@ -16,10 +16,12 @@ public class GetByIdHandler(IEntityRepositoryBase<int, User> repository,
 
     public async Task<UserResponseDto> Handle(GetUserByIdQuery request, CancellationToken ct)
     {
-        _logger.LogInformation("Start executing GetByIdQuery for User with {Id} in GetByIdHandler.", request.Id);
+        _logger.LogInformation("Start executing GetByIdQuery for {User} with {Id} in GetByIdHandler.",
+            typeof(User).Name, request.Id);
         var user = await _repository.GetById(request.Id, SqlStatements.ForUsers.GetById);
-        _ = user ?? throw new NotFoundException($"User with Id = {request.Id} not found");
-        _logger.LogInformation("Successfully completed executing GetByIdQuery for User with {Id} in EntityRepository.", user.Id);
+        _ = user ?? throw new NotFoundException($"{typeof(User).Name} with Id = {request.Id} not found");
+        _logger.LogInformation("Successfully completed executing GetByIdQuery for {User} with {Id} in EntityRepository.",
+            typeof(User).Name, user.Id);
 
         return user.ToDto();
     }

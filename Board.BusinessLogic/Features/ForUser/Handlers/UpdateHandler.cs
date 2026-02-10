@@ -15,10 +15,10 @@ public class UpdateHandler(IEntityRepositoryBase<int, User> repository,
 
     public async Task<UserResponseDto> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Start updating User with {Id} in UpdateHandler.", request.Id);
+        _logger.LogInformation("Start updating {User} with {Id} in UpdateHandler.", typeof(User).Name, request.Id);
         var user = new User { Id = request.Id, Email = request.Email, DisplayName = request.DisplayName };
         var result = await _repository.Update(user, SqlStatements.ForUsers.Update);
-        _logger.LogInformation("Successfully completed updating User with {Id} in EntityRepository.", request.Id);
+        _logger.LogInformation("Successfully completed updating {User} with {Id} in EntityRepository.", typeof(User).Name, request.Id);
 
         return result.ToDto();
     }

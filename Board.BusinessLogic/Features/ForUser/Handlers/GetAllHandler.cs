@@ -16,10 +16,10 @@ public class GetAllHandler(IEntityRepositoryBase<int, User> repository,
 
     public async Task<IEnumerable<UserResponseDto>> Handle(GetAllUserQuery request, CancellationToken ct)
     {
-        _logger.LogInformation("Start executing GetAllQuery for Users in UpdateHandler.");
+        _logger.LogInformation("Start executing GetAllQuery for {User}s in UpdateHandler.", typeof(User).Name);
         var users = await _repository.GetAll(SqlStatements.ForUsers.GetAll);
         _ = users ?? throw new NotFoundException($"No users found");
-        _logger.LogInformation("Successfully completed executing GetAllQuery for Users in EntityRepository.");
+        _logger.LogInformation("Successfully completed executing GetAllQuery for {User}s in EntityRepository.", typeof(User).Name);
 
         return users.ToDto();
     }

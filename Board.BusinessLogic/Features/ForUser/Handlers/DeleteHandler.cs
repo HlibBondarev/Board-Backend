@@ -14,7 +14,7 @@ public class DeleteHandler(IEntityRepositoryBase<int, User> repository,
 
     public async Task<bool> Handle(DeleteUserCommand request, CancellationToken ct)
     {
-        _logger.LogInformation("Start deleting User with {Id} in DeleteHandler.", request.Id);
+        _logger.LogInformation("Start deleting {User} with {Id} in DeleteHandler.", typeof(User).Name, request.Id);
 
         return await _repository.Delete(request.Id, SqlStatements.ForUsers.Delete);
     }

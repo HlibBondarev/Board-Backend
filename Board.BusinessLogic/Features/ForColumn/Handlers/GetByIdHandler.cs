@@ -16,10 +16,12 @@ public class GetByIdHandler(IEntityRepositoryBase<int, Column> repository,
 
     public async Task<ColumnResponseDto> Handle(GetColumnByIdQuery request, CancellationToken ct)
     {
-        _logger.LogInformation("Start executing GetByIdQuery for Column with {Id} in GetByIdHandler.", request.Id);
+        _logger.LogInformation("Start executing GetByIdQuery for {Column} with {Id} in GetByIdHandler.",
+            typeof(Column).Name, request.Id);
         var column = await _repository.GetById(request.Id, SqlStatements.ForColumns.GetById);
-        _ = column ?? throw new NotFoundException($"Column with Id = {request.Id} not found");
-        _logger.LogInformation("Successfully completed executing GetByIdQuery for Column with {Id} in EntityRepository.", column.Id);
+        _ = column ?? throw new NotFoundException($"{typeof(Column).Name} with Id = {request.Id} not found");
+        _logger.LogInformation("Successfully completed executing GetByIdQuery for {Column} with {Id} in EntityRepository.",
+            typeof(Column).Name, column.Id);
 
         return column.ToDto();
     }

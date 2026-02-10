@@ -15,10 +15,12 @@ public class UpdateHandler(IEntityRepositoryBase<int, Column> repository,
 
     public async Task<ColumnResponseDto> Handle(UpdateColumnCommand request, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Start updating Column with {Id} in UpdateHandler.", request.Id);
+        _logger.LogInformation("Start updating {Column} with {Id} in UpdateHandler.",
+            typeof(Column).Name, request.Id);
         var column = new Column { Id = request.Id, Name = request.Name, Position = request.Position };
         var result = await _repository.Update(column, SqlStatements.ForColumns.Update);
-        _logger.LogInformation("Successfully completed updating Column with {Id} in EntityRepository.", request.Id);
+        _logger.LogInformation("Successfully completed updating {Column} with {Id} in EntityRepository.",
+            typeof(Column).Name, request.Id);
 
         return result.ToDto();
     }

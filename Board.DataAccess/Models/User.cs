@@ -3,11 +3,19 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Board.DataAccess.Models;
 
-// Class for the User entity
 public class User : IKeyedEntity<int>
 {
+    [Required]
     public int Id { get; init; }
-    public required string Email { get; set; }
+
+    [Required]
+    [EmailAddress]
+    public string Email { get; set; } = null!;
+
+    [Required]
     [StringLength(20, MinimumLength = 3)]
-    public required string DisplayName { get; set; }
+    public string DisplayName { get; set; } = null!;
+
+    [Required]
+    public DateTime CreatedAt { get; set; }
 }

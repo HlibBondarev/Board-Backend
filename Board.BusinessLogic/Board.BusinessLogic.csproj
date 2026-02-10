@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Features\Column\**" />
+    <Compile Remove="Features\User\**" />
+    <EmbeddedResource Remove="Features\Column\**" />
+    <EmbeddedResource Remove="Features\User\**" />
+    <None Remove="Features\Column\**" />
+    <None Remove="Features\User\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" Version="14.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Board.DataAccess\Board.DataAccess.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Features\ForUser\Commands\CreateUserCommand.cs" />
+  </ItemGroup>
+
+</Project>

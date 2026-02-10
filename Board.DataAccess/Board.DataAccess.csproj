@@ -7,7 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="SQLscripts\01-Tables.sql" />
+    <None Remove="SQLscripts\02-Sprocs.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="SQLscripts\01-Tables.sql" />
+    <EmbeddedResource Include="SQLscripts\02-Sprocs.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Dapper" Version="2.1.66" />
+    <PackageReference Include="dbup" Version="5.0.41" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.4" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.2" />
   </ItemGroup>

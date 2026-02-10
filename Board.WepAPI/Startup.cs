@@ -1,6 +1,7 @@
 ﻿using Board.BusinessLogic.Features;
 using Board.DataAccess.Repository.Base;
 using Board.WepAPI.Middleware;
+using DbUp;
 using Scalar.AspNetCore;
 using Serilog;
 using Serilog.Exceptions;
@@ -22,10 +23,22 @@ public static class Startup
         var services = builder.Services;
         var configuration = builder.Configuration;
         var connectionString = configuration.GetConnectionString("DefaultConnection");
+        EnsureDatabase.For.SqlDatabase(connectionString);
 
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();
 
+        var upgrader = DeployChanges.To
+            .SqlDatabase(connectionString, null)
+            .WithScriptsEmbeddedInAssembly(typeof(EntityRepositoryBase<,>).Assembly)
+            .WithTransaction()
+            .LogToConsole()
+            .Build();
+
+        if (upgrader.IsUpgradeRequired())
+        {
+            upgrader.PerformUpgrade();
+        }
 
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         services.AddOpenApi();

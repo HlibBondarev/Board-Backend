@@ -5,6 +5,7 @@ namespace Board.DataAccess.Models;
 
 public class Issue : IKeyedEntity<int>
 {
+    [Required]
     public int Id { get; init; }
 
     [Required]
@@ -19,13 +20,18 @@ public class Issue : IKeyedEntity<int>
     [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
     public DateTime? DueDate { get; set; }
 
+    [Required]
     public DateTime CreatedAt { get; set; }
 
+    [Required]
     public int PositionInColumn { get; set; }
 
+    [Required]
     public int ColumnId { get; set; }
 
+    [Required]
     public int CreatorId { get; set; }
 
+    [Required]
     public int? AssigneeId { get; set; }
 }

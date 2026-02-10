@@ -5,6 +5,7 @@ namespace Board.DataAccess.Models;
 
 public class User : IKeyedEntity<int>
 {
+    [Required]
     public int Id { get; init; }
 
     [Required]
@@ -15,5 +16,6 @@ public class User : IKeyedEntity<int>
     [StringLength(20, MinimumLength = 3)]
     public string DisplayName { get; set; } = null!;
 
+    [Required]
     public DateTime CreatedAt { get; set; }
 }

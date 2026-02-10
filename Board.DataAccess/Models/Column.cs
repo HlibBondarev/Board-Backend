@@ -15,7 +15,9 @@ public class Column : IKeyedEntity<int>
     [StringLength(200, MinimumLength = 10)]
     public string Description { get; set; } = null!;
 
+    [Required]
     public int Position { get; set; }
 
+    [Required]
     public int UserId { get; set; }
 }

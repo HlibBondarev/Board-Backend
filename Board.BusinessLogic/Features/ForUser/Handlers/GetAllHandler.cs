@@ -9,12 +9,12 @@ using Microsoft.Extensions.Logging;
 namespace Board.BusinessLogic.Features.ForUser.Handlers;
 
 public class GetAllHandler(IEntityRepositoryBase<int, User> repository,
-    ILogger<GetAllHandler> logger) : IRequestHandler<GetAllUserQuery, IEnumerable<UserResponseDto>>
+    ILogger<GetAllHandler> logger) : IRequestHandler<GetAllUsersQuery, IEnumerable<UserResponseDto>>
 {
     private readonly IEntityRepositoryBase<int, User> _repository = repository;
     private readonly ILogger<GetAllHandler> _logger = logger;
 
-    public async Task<IEnumerable<UserResponseDto>> Handle(GetAllUserQuery request, CancellationToken ct)
+    public async Task<IEnumerable<UserResponseDto>> Handle(GetAllUsersQuery request, CancellationToken ct)
     {
         _logger.LogInformation("Start executing GetAllQuery for {User}s in UpdateHandler.", typeof(User).Name);
         var users = await _repository.GetAll(SqlStatements.ForUsers.GetAll);

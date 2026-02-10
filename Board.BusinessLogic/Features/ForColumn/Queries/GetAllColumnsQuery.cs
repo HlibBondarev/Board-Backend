@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Board.BusinessLogic.Features.ForColumn.Queries;
 
-public record GetAllColumnQuery : IRequest<IEnumerable<ColumnResponseDto>>;
+public record GetAllColumnsQuery : IRequest<IEnumerable<ColumnResponseDto>>;

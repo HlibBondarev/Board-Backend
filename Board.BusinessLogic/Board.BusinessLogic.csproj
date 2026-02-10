@@ -25,10 +25,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\ForIssue\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="Features\ForUser\Commands\CreateUserCommand.cs" />
   </ItemGroup>
 

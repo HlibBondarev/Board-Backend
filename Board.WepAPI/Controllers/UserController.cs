@@ -16,7 +16,7 @@ public class UserController(IMediator mediator, ILogger<UserController> logger) 
     [HttpGet]
     public async Task<IEnumerable<UserResponseDto>> GetAllUsers()
     {
-        var users = await _mediator.Send(new GetAllUserQuery());
+        var users = await _mediator.Send(new GetAllUsersQuery());
 
         return users ?? [];
     }

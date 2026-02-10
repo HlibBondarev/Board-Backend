@@ -16,7 +16,7 @@ public class UserController(IMediator mediator, ILogger<UserController> logger) 
     [HttpGet]
     public async Task<IEnumerable<UserResponseDto>> GetAllUsers()
     {
-        var users = await _mediator.Send(new GetAllQuery());
+        var users = await _mediator.Send(new GetAllUserQuery());
 
         return users ?? [];
     }
@@ -24,7 +24,7 @@ public class UserController(IMediator mediator, ILogger<UserController> logger) 
     [HttpGet("{userId}")]
     public async Task<ActionResult<UserResponseDto>> GetUser(int userId)
     {
-        var user = await _mediator.Send(new GetByIdQuery(userId));
+        var user = await _mediator.Send(new GetUserByIdQuery(userId));
         if (user == null)
         {
             return NotFound();
@@ -47,7 +47,7 @@ public class UserController(IMediator mediator, ILogger<UserController> logger) 
     [HttpPut("{userId}")]
     public async Task<ActionResult<UserResponseDto>> Update(int userId, UpdateUserCommand command)
     {
-        var user = await _mediator.Send(new GetByIdQuery(userId));
+        var user = await _mediator.Send(new GetUserByIdQuery(userId));
         if (user == null)
         {
             return NotFound();
@@ -60,7 +60,7 @@ public class UserController(IMediator mediator, ILogger<UserController> logger) 
     [HttpDelete("{userId}")]
     public async Task<IActionResult> Delete(int userId)
     {
-        var user = await _mediator.Send(new GetByIdQuery(userId));
+        var user = await _mediator.Send(new GetUserByIdQuery(userId));
         if (user == null)
         {
             return NotFound();

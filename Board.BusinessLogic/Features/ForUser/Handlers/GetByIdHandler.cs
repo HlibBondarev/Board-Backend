@@ -9,12 +9,12 @@ using Microsoft.Extensions.Logging;
 namespace Board.BusinessLogic.Features.ForUser.Handlers;
 
 public class GetByIdHandler(IEntityRepositoryBase<int, User> repository,
-    ILogger<DeleteHandler> logger) : IRequestHandler<GetByIdQuery, UserResponseDto>
+    ILogger<GetByIdHandler> logger) : IRequestHandler<GetUserByIdQuery, UserResponseDto>
 {
     private readonly IEntityRepositoryBase<int, User> _repository = repository;
-    private readonly ILogger<DeleteHandler> _logger = logger;
+    private readonly ILogger<GetByIdHandler> _logger = logger;
 
-    public async Task<UserResponseDto> Handle(GetByIdQuery request, CancellationToken ct)
+    public async Task<UserResponseDto> Handle(GetUserByIdQuery request, CancellationToken ct)
     {
         _logger.LogInformation("Start executing GetByIdQuery for User with {Id} in GetByIdHandler.", request.Id);
         var user = await _repository.GetById(request.Id, SqlStatements.ForUsers.GetById);

@@ -3,13 +3,19 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Board.DataAccess.Models;
 
-// Class for the Column (Status) entity
 public class Column : IKeyedEntity<int>
 {
-    public int Id { get; init; } // Status ID
+    public int Id { get; init; }
 
-    [StringLength(20, MinimumLength = 3)]
-    public string Name { get; set; } = null!;// Column name (e.g., "In Progress", up to 20 characters)
+    [Required]
+    [StringLength(50, MinimumLength = 3)]
+    public string Name { get; set; } = null!;
 
-    public int Position { get; set; } // Display order (1, 2, 3...)
+    [Required]
+    [StringLength(200, MinimumLength = 10)]
+    public string Description { get; set; } = null!;
+
+    public int Position { get; set; }
+
+    public int UserId { get; set; }
 }

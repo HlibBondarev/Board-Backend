@@ -7,8 +7,13 @@ public class User : IKeyedEntity<int>
 {
     public int Id { get; init; }
 
+    [Required]
+    [EmailAddress]
     public string Email { get; set; } = null!;
 
+    [Required]
     [StringLength(20, MinimumLength = 3)]
     public string DisplayName { get; set; } = null!;
+
+    public DateTime CreatedAt { get; set; }
 }

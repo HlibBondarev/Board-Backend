@@ -6,10 +6,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Board.BusinessLogic.Features.ForUser.Handlers;
 
-public class DeleteHandler(IEntityRepositoryBase<int, User> repository,
+public class DeleteHandler(IEntityRepositoryBase<string, User> repository,
     ILogger<DeleteHandler> logger) : IRequestHandler<DeleteUserCommand, bool>
 {
-    private readonly IEntityRepositoryBase<int, User> _repository = repository;
+    private readonly IEntityRepositoryBase<string, User> _repository = repository;
     private readonly ILogger<DeleteHandler> _logger = logger;
 
     public async Task<bool> Handle(DeleteUserCommand request, CancellationToken ct)

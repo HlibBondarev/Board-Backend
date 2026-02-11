@@ -7,10 +7,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Board.BusinessLogic.Features.ForUser.Handlers;
 
-public class CreateHandler(IEntityRepositoryBase<int, User> repository,
+public class CreateHandler(IEntityRepositoryBase<string, User> repository,
     ILogger<CreateHandler> logger) : IRequestHandler<CreateUserCommand, UserResponseDto>
 {
-    private readonly IEntityRepositoryBase<int, User> _repository = repository;
+    private readonly IEntityRepositoryBase<string, User> _repository = repository;
     private readonly ILogger<CreateHandler> _logger = logger;
 
     public async Task<UserResponseDto> Handle(CreateUserCommand request, CancellationToken cancellationToken)

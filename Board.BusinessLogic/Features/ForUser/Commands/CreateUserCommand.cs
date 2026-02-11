@@ -8,6 +8,10 @@ namespace Board.BusinessLogic.Features.ForUser.Commands;
 
 public record CreateUserCommand(
     [Required]
+    [StringLength(64)]
+    string Id,
+
+    [Required]
     [EmailAddress]
     string Email,
 
@@ -20,6 +24,7 @@ public static class CreateUserCommandExtensions
 {
     public static User ToModel(this CreateUserCommand dto) => new()
     {
+        Id = dto.Id,
         Email = dto.Email,
         DisplayName = dto.DisplayName,
         CreatedAt = DateTime.UtcNow

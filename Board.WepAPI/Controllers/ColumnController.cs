@@ -2,6 +2,7 @@
 using Board.BusinessLogic.Features.ForColumn.Commands;
 using Board.BusinessLogic.Features.ForColumn.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Board.WepAPI.Controllers;
@@ -33,6 +34,7 @@ public class ColumnController(IMediator mediator, ILogger<ColumnController> logg
         return column;
     }
 
+    [Authorize]
     [HttpPost]
     public async Task<ActionResult<ColumnResponseDto>> Create(CreateColumnCommand command)
     {
@@ -44,6 +46,7 @@ public class ColumnController(IMediator mediator, ILogger<ColumnController> logg
         }, createdColumn);
     }
 
+    [Authorize]
     [HttpPut("{columnId}")]
     public async Task<ActionResult<ColumnResponseDto>> Update(int columnId, UpdateColumnCommand command)
     {
@@ -57,6 +60,7 @@ public class ColumnController(IMediator mediator, ILogger<ColumnController> logg
         return savedColumn;
     }
 
+    [Authorize]
     [HttpDelete("{columnId}")]
     public async Task<IActionResult> Delete(int columnId)
     {

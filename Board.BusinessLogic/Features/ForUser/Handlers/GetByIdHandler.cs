@@ -8,10 +8,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Board.BusinessLogic.Features.ForUser.Handlers;
 
-public class GetByIdHandler(IEntityRepositoryBase<int, User> repository,
+public class GetByIdHandler(IEntityRepositoryBase<string, User> repository,
     ILogger<GetByIdHandler> logger) : IRequestHandler<GetUserByIdQuery, UserResponseDto>
 {
-    private readonly IEntityRepositoryBase<int, User> _repository = repository;
+    private readonly IEntityRepositoryBase<string, User> _repository = repository;
     private readonly ILogger<GetByIdHandler> _logger = logger;
 
     public async Task<UserResponseDto> Handle(GetUserByIdQuery request, CancellationToken ct)

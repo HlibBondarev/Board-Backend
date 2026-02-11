@@ -8,7 +8,7 @@ namespace Board.BusinessLogic.Features.ForUser.Commands;
 
 public record UpdateUserCommand(
     [Required]
-    int Id,
+    string Id,
 
     [Required]
     [EmailAddress]

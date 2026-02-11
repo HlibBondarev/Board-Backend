@@ -11,8 +11,8 @@ public record IssueResponseDto(
     DateTime CreatedAt,
     int PositionInColumn,
     int ColumnId,
-    int CreatorId,
-    int? AssigneeId);
+    string CreatorId,
+    string? AssigneeId);
 
 public static class IssueResponseDtoExtensions
 {

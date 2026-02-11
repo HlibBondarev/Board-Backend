@@ -30,8 +30,7 @@ public class Issue : IKeyedEntity<int>
     public int ColumnId { get; set; }
 
     [Required]
-    public int CreatorId { get; set; }
+    public string CreatorId { get; set; } = null!;
 
-    [Required]
-    public int? AssigneeId { get; set; }
+    public string? AssigneeId { get; set; }
 }

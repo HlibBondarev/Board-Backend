@@ -1,7 +1,10 @@
 ﻿using Board.BusinessLogic.Features;
 using Board.DataAccess.Repository.Base;
+using Board.WepAPI.Authorization;
 using Board.WepAPI.Middleware;
 using DbUp;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Scalar.AspNetCore;
 using Serilog;
 using Serilog.Exceptions;
@@ -47,6 +50,29 @@ public static class Startup
 
         services.AddControllers();
 
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme =
+            JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme =
+            JwtBearerDefaults.AuthenticationScheme;
+        }).AddJwtBearer(options =>
+        {
+            options.Authority = configuration["Auth0:Authority"];
+            options.Audience = configuration["Auth0:Audience"];
+        });
+
+        services.AddHttpClient();
+        services.AddAuthorization(options =>
+          options.AddPolicy("MustBeThisUser", policy =>
+            policy.Requirements
+              .Add(new MustBeThisUserRequirement())));
+
+        services.AddScoped<IAuthorizationHandler, MustBeThisUserHandler>();
+        services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+
+
         //services.AddScoped(typeof(IEntityRepositoryBase<,>), typeof(EntityRepositoryBase<,>));
         services.AddTransient(typeof(IEntityRepositoryBase<,>), typeof(EntityRepositoryBase<,>));
     }
@@ -71,9 +97,11 @@ public static class Startup
             app.UseHttpsRedirection();
         }
 
+        app.UseRouting();
+
         app.UseAuthentication();
 
-        //app.UseAuthorization();
+        app.UseAuthorization();
 
         app.MapControllers();
 

@@ -8,7 +8,7 @@ public record ColumnResponseDto(
     string Name,
     string Description,
     int Position,
-    int UserId);
+    string UserId);
 
 public static class ColumnResponseDtoExtensions
 {

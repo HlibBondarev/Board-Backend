@@ -25,9 +25,9 @@ public record CreateIssueCommand(
     int ColumnId,
 
     [Required]
-    int CreatorId,
+    string CreatorId,
 
-    int? AssigneeId
+    string? AssigneeId
 ) : IRequest<IssueResponseDto>;
 
 public static class CreateColumnCommandExtensions

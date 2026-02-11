@@ -3,13 +3,14 @@ GO
 
 -- Post
 CREATE PROCEDURE dbo.User_Post
+    @Id VARCHAR(64),
     @Email NVARCHAR(255),
     @DisplayName NVARCHAR(20),
 	@CreatedAt DATETIME2
 AS
 BEGIN
-    INSERT INTO Users (Email, DisplayName, CreatedAt)
-    VALUES (@Email, @DisplayName, @CreatedAt);
+    INSERT INTO Users (Id, Email, DisplayName, CreatedAt)
+    VALUES (@Id, @Email, @DisplayName, @CreatedAt);
 
     SELECT * FROM Users WHERE Id = SCOPE_IDENTITY();
 END
@@ -17,7 +18,7 @@ GO
 
 -- GetSingle
 CREATE PROCEDURE dbo.User_GetSingle
-    @Id INT
+    @Id VARCHAR(64)
 AS
 BEGIN
     SELECT * FROM Users WHERE Id = @Id;
@@ -33,7 +34,7 @@ END;
 GO
 
 -- Any
-CREATE PROCEDURE dbo.User_Any @Id INT
+CREATE PROCEDURE dbo.User_Any @Id VARCHAR(64)
 AS
 BEGIN
     SELECT CASE WHEN EXISTS (SELECT 1 FROM Users WHERE Id = @Id) THEN 1 ELSE 0 END;
@@ -42,7 +43,7 @@ GO
 
 -- Put (Update)
 CREATE PROCEDURE dbo.User_Put
-    @Id INT,
+    @Id VARCHAR(64),
     @Email NVARCHAR(255),
     @DisplayName NVARCHAR(20),
 	@CreatedAt DATETIME2
@@ -56,7 +57,7 @@ END;
 GO
 
 -- Delete
-CREATE PROCEDURE dbo.User_Delete @Id INT
+CREATE PROCEDURE dbo.User_Delete @Id VARCHAR(64)
 AS
 BEGIN
     DELETE FROM Users WHERE Id = @Id;
@@ -69,7 +70,7 @@ CREATE PROCEDURE dbo.Column_Post
     @Name NVARCHAR(50),
 	@Description NVARCHAR(200),
     @Position INT,
-	@UserId  INT
+	@UserId  VARCHAR(64)
 AS
 BEGIN
     INSERT INTO Columns (Name, Description, Position, UserId)
@@ -110,7 +111,7 @@ CREATE PROCEDURE dbo.Column_Put
     @Name NVARCHAR(50),
 	@Description NVARCHAR(200),
     @Position INT,
-	@UserId INT
+	@UserId VARCHAR(64)
 AS
 BEGIN
     UPDATE Columns SET Name = @Name, Description = @Description, Position = @Position, UserId = @UserId WHERE Id = @Id;
@@ -135,8 +136,8 @@ CREATE PROCEDURE dbo.Issue_Post
     @CreatedAt DATETIME2,
 	@PositionInColumn INT,
     @ColumnId INT,
-    @CreatorId INT,
-    @AssigneeId INT
+    @CreatorId VARCHAR(64),
+    @AssigneeId VARCHAR(64)
 AS
 BEGIN
     INSERT INTO Issues (Title, Description, DueDate, CreatedAt, PositionInColumn, ColumnId, CreatorId, AssigneeId)
@@ -180,8 +181,8 @@ CREATE PROCEDURE dbo.Issue_Put
     @CreatedAt DATETIME2,
 	@PositionInColumn INT,
     @ColumnId INT,
-    @CreatorId INT,
-    @AssigneeId INT
+    @CreatorId VARCHAR(64),
+    @AssigneeId VARCHAR(64)
 AS
 BEGIN
     UPDATE Issues 

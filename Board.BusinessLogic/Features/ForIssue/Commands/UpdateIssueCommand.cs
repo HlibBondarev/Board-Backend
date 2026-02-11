@@ -31,9 +31,9 @@ public record UpdateIssueCommand(
     int ColumnId,
 
     [Required]
-    int CreatorId,
+    string CreatorId,
 
-    int? AssigneeId
+    string? AssigneeId
 ) : IRequest<IssueResponseDto>;
 
 public static class UpdateColumnCommandExtensions

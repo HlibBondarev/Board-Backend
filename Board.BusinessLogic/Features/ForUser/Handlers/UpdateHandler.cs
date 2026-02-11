@@ -7,10 +7,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Board.BusinessLogic.Features.ForUser.Handlers;
 
-public class UpdateHandler(IEntityRepositoryBase<int, User> repository,
+public class UpdateHandler(IEntityRepositoryBase<string, User> repository,
     ILogger<UpdateHandler> logger) : IRequestHandler<UpdateUserCommand, UserResponseDto>
 {
-    private readonly IEntityRepositoryBase<int, User> _repository = repository;
+    private readonly IEntityRepositoryBase<string, User> _repository = repository;
     private readonly ILogger<UpdateHandler> _logger = logger;
 
     public async Task<UserResponseDto> Handle(UpdateUserCommand request, CancellationToken cancellationToken)

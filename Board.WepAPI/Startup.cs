@@ -1,4 +1,6 @@
 ﻿using Board.BusinessLogic.Features;
+using Board.BusinessLogic.Services;
+using Board.BusinessLogic.Services.Api;
 using Board.DataAccess.Repository.Base;
 using Board.WepAPI.Authorization;
 using Board.WepAPI.Middleware;
@@ -71,7 +73,12 @@ public static class Startup
         services.AddScoped<IAuthorizationHandler, MustBeThisUserHandler>();
         services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-
+        services.AddHttpClient<ICurrentUser, CurrentUser>(client =>
+        {
+            var authority = configuration["Auth:Authority"];
+            _ = authority ?? throw new ArgumentNullException(nameof(authority));
+            client.BaseAddress = new Uri($"{authority.TrimEnd('/')}/");
+        });
 
         //services.AddScoped(typeof(IEntityRepositoryBase<,>), typeof(EntityRepositoryBase<,>));
         services.AddTransient(typeof(IEntityRepositoryBase<,>), typeof(EntityRepositoryBase<,>));

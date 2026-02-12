@@ -12,7 +12,7 @@ public class CreateHandler(IEntityRepositoryBase<int, Column> repository,
 {
     public async Task<ColumnResponseDto> Handle(CreateColumnCommand request, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Start creating {Column} in UpdateHandler.", typeof(Column).Name);
+        logger.LogInformation("Start creating {Column} in CreateHandler.", typeof(Column).Name);
         Column column = request.ToModel();
         Column result = await repository.Create(column, SqlStatements.ForColumns.Create);
         logger.LogInformation("Successfully completed creating {Column} with {Id} in EntityRepository.",

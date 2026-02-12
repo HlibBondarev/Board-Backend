@@ -13,10 +13,10 @@ public class GetAllHandler(IEntityRepositoryBase<int, Issue> repository,
 {
     public async Task<IEnumerable<IssueResponseDto>> Handle(GetAllIssuesQuery request, CancellationToken ct)
     {
-        logger.LogInformation("Start executing GetAllQuery for {Issue}s in UpdateHandler.", typeof(Issue).Name);
+        logger.LogInformation("Start executing GetAllQuery for {Issue}s in GetAllHandler.", typeof(Issue).Name);
         var issues = await repository.GetAll(SqlStatements.ForIssues.GetAll);
-        _ = issues ?? throw new NotFoundException($"No Issues found");
         logger.LogInformation("Successfully completed executing GetAllQuery for {Issue}s in EntityRepository.", typeof(Issue).Name);
+        _ = issues ?? throw new NotFoundException($"No Issues found");
 
         return issues.ToDto();
     }

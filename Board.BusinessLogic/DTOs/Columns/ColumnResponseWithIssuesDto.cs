@@ -2,11 +2,11 @@
 
 namespace Board.BusinessLogic.DTOs.Columns;
 
-public class ColumnResponseWithIssuesDto
-{
-    public int Id { get; set; }
-    public string Name { get; set; } = null!;
-    public int Position { get; set; }
-    public int BoardId { get; set; }
-    public List<IssueResponseDto> Issues { get; set; } = [];
-}
+public record ColumnResponseWithIssuesDto(
+    int Id,
+    string Name,
+    string Description,
+    int Position,
+    string UserId,
+    List<IssueResponseDto> Issues
+    );

@@ -13,7 +13,7 @@ public class CreateHandler(IEntityRepositoryBase<int, Issue> repository,
 {
     public async Task<IssueResponseDto> Handle(CreateIssueCommand request, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Start creating {Issue} in UpdateHandler.", typeof(Issue).Name);
+        logger.LogInformation("Start creating {Issue} in CreateHandler.", typeof(Issue).Name);
         Issue issue = request.ToModel();
         Issue result = await repository.Create(issue, SqlStatements.ForIssues.Create);
         logger.LogInformation("Successfully completed creating {Issue} with {Id} in EntityRepository.",

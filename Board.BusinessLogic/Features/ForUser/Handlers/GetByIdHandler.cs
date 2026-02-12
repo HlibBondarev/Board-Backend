@@ -16,9 +16,9 @@ public class GetByIdHandler(IEntityRepositoryBase<string, User> repository,
         logger.LogInformation("Start executing GetByIdQuery for {User} with {Id} in GetByIdHandler.",
             typeof(User).Name, request.Id);
         var user = await repository.GetById(request.Id, SqlStatements.ForUsers.GetById);
-        _ = user ?? throw new NotFoundException($"{typeof(User).Name} with Id = {request.Id} not found");
         logger.LogInformation("Successfully completed executing GetByIdQuery for {User} with {Id} in EntityRepository.",
             typeof(User).Name, user.Id);
+        _ = user ?? throw new NotFoundException($"{typeof(User).Name} with Id = {request.Id} not found");
 
         return user.ToDto();
     }

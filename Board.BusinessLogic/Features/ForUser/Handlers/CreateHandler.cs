@@ -12,7 +12,7 @@ public class CreateHandler(IEntityRepositoryBase<string, User> repository,
 {
     public async Task<UserResponseDto> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Start creating {User} in UpdateHandler.", typeof(User).Name);
+        logger.LogInformation("Start creating {User} in CreateHandler.", typeof(User).Name);
         User user = request.ToModel();
         User result = await repository.Create(user, SqlStatements.ForUsers.Create);
         logger.LogInformation("Successfully completed creating {User} with {Id} in EntityRepository.",

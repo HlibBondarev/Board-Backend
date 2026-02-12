@@ -27,8 +27,4 @@
     <ProjectReference Include="..\Board.Common\Board.Common.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Repository\Api\" />
-  </ItemGroup>
-
 </Project>

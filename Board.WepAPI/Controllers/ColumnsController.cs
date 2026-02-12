@@ -15,9 +15,9 @@ public class ColumnsController(IMediator mediator, ILogger<ColumnsController> lo
     private readonly ILogger<ColumnsController> _logger = logger;
 
     [HttpGet]
-    public async Task<IEnumerable<ColumnResponseDto>> GetAllColumns()
+    public async Task<IEnumerable<ColumnResponseWithIssuesDto>> GetAllColumns()
     {
-        var columns = await _mediator.Send(new GetAllColumnsQuery());
+        var columns = await _mediator.Send(new GetAllColumnsWithIssuesQuery());
 
         return columns ?? [];
     }

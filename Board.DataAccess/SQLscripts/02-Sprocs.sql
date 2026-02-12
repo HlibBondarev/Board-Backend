@@ -9,6 +9,8 @@ CREATE PROCEDURE dbo.User_Post
 	@CreatedAt DATETIME2
 AS
 BEGIN
+	SET NOCOUNT ON
+
     INSERT INTO Users (Id, Email, DisplayName, CreatedAt)
     VALUES (@Id, @Email, @DisplayName, @CreatedAt);
 
@@ -21,6 +23,8 @@ CREATE PROCEDURE dbo.User_GetSingle
     @Id VARCHAR(64)
 AS
 BEGIN
+	SET NOCOUNT ON
+
     SELECT * FROM Users WHERE Id = @Id;
 END
 GO
@@ -29,6 +33,8 @@ GO
 CREATE PROCEDURE dbo.User_GetAll
 AS
 BEGIN
+	SET NOCOUNT ON
+
     SELECT Id, Email, DisplayName, CreatedAt FROM Users;
 END;
 GO
@@ -49,6 +55,8 @@ CREATE PROCEDURE dbo.User_Put
 	@CreatedAt DATETIME2
 AS
 BEGIN
+	SET NOCOUNT ON
+
     UPDATE Users 
     SET Email = @Email, DisplayName = @DisplayName, CreatedAt = @CreatedAt
     WHERE Id = @Id;
@@ -60,6 +68,8 @@ GO
 CREATE PROCEDURE dbo.User_Delete @Id VARCHAR(64)
 AS
 BEGIN
+	SET NOCOUNT ON
+
     DELETE FROM Users WHERE Id = @Id;
 END;
 GO
@@ -73,6 +83,8 @@ CREATE PROCEDURE dbo.Column_Post
 	@UserId  VARCHAR(64)
 AS
 BEGIN
+	SET NOCOUNT ON
+
     INSERT INTO Columns (Name, Description, Position, UserId)
     VALUES (@Name, @Description, @Position, @UserId);
 
@@ -85,6 +97,8 @@ CREATE PROCEDURE dbo.Column_GetSingle
     @Id INT
 AS
 BEGIN
+	SET NOCOUNT ON
+
     SELECT * FROM Columns WHERE Id = @Id;
 END
 GO
@@ -93,6 +107,8 @@ GO
 CREATE PROCEDURE dbo.Column_GetAll
 AS
 BEGIN
+	SET NOCOUNT ON
+
     SELECT Id, Name, Description, Position, UserId FROM Columns;
 END;
 GO
@@ -101,6 +117,8 @@ GO
 CREATE PROCEDURE dbo.Column_Any @Id INT
 AS
 BEGIN
+	SET NOCOUNT ON
+
     SELECT CASE WHEN EXISTS (SELECT 1 FROM Columns WHERE Id = @Id) THEN 1 ELSE 0 END;
 END;
 GO
@@ -114,6 +132,8 @@ CREATE PROCEDURE dbo.Column_Put
 	@UserId VARCHAR(64)
 AS
 BEGIN
+	SET NOCOUNT ON
+
     UPDATE Columns SET Name = @Name, Description = @Description, Position = @Position, UserId = @UserId WHERE Id = @Id;
     SELECT * FROM Columns WHERE Id = @Id;
 END;
@@ -123,6 +143,8 @@ GO
 CREATE PROCEDURE dbo.Column_Delete @Id INT
 AS
 BEGIN
+	SET NOCOUNT ON
+
     DELETE FROM Columns WHERE Id = @Id;
 END;
 GO
@@ -140,6 +162,8 @@ CREATE PROCEDURE dbo.Issue_Post
     @AssigneeId VARCHAR(64)
 AS
 BEGIN
+	SET NOCOUNT ON
+
     INSERT INTO Issues (Title, Description, DueDate, CreatedAt, PositionInColumn, ColumnId, CreatorId, AssigneeId)
     VALUES (@Title, @Description, @DueDate, @CreatedAt, @PositionInColumn, @ColumnId, @CreatorId, @AssigneeId);
 
@@ -152,6 +176,8 @@ CREATE PROCEDURE dbo.Issue_GetSingle
     @Id INT
 AS
 BEGIN
+	SET NOCOUNT ON
+
     SELECT * FROM Issues WHERE Id = @Id;
 END
 GO
@@ -160,6 +186,8 @@ GO
 CREATE PROCEDURE dbo.Issue_GetAll
 AS
 BEGIN
+	SET NOCOUNT ON
+
     SELECT Id, Title, Description, DueDate, CreatedAt, PositionInColumn, ColumnId, CreatorId, AssigneeId FROM Issues;
 END;
 GO
@@ -168,6 +196,8 @@ GO
 CREATE PROCEDURE dbo.Issue_Any @Id INT
 AS
 BEGIN
+	SET NOCOUNT ON
+
     SELECT CASE WHEN EXISTS (SELECT 1 FROM Issues WHERE Id = @Id) THEN 1 ELSE 0 END;
 END;
 GO
@@ -185,6 +215,8 @@ CREATE PROCEDURE dbo.Issue_Put
     @AssigneeId VARCHAR(64)
 AS
 BEGIN
+	SET NOCOUNT ON
+
     UPDATE Issues 
     SET Title = @Title, Description = @Description, DueDate = @DueDate,
 		CreatedAt = @CreatedAt, PositionInColumn = @PositionInColumn,
@@ -198,6 +230,8 @@ GO
 CREATE PROCEDURE dbo.Issue_Delete @Id INT
 AS
 BEGIN
+	SET NOCOUNT ON
+
     DELETE FROM Issues WHERE Id = @Id;
 END;
 GO

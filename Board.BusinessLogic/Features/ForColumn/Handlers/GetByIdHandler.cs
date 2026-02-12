@@ -16,9 +16,9 @@ public class GetByIdHandler(IEntityRepositoryBase<int, Column> repository,
         logger.LogInformation("Start executing GetByIdQuery for {Column} with {Id} in GetByIdHandler.",
             typeof(Column).Name, request.Id);
         var column = await repository.GetById(request.Id, SqlStatements.ForColumns.GetById);
-        _ = column ?? throw new NotFoundException($"{typeof(Column).Name} with Id = {request.Id} not found");
         logger.LogInformation("Successfully completed executing GetByIdQuery for {Column} with {Id} in EntityRepository.",
             typeof(Column).Name, column.Id);
+        _ = column ?? throw new NotFoundException($"{typeof(Column).Name} with Id = {request.Id} not found");
 
         return column.ToDto();
     }

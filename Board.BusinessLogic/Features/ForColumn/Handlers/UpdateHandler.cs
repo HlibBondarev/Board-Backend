@@ -10,16 +10,13 @@ namespace Board.BusinessLogic.Features.ForColumn.Handlers;
 public class UpdateHandler(IEntityRepositoryBase<int, Column> repository,
     ILogger<UpdateHandler> logger) : IRequestHandler<UpdateColumnCommand, ColumnResponseDto>
 {
-    private readonly IEntityRepositoryBase<int, Column> _repository = repository;
-    private readonly ILogger<UpdateHandler> _logger = logger;
-
     public async Task<ColumnResponseDto> Handle(UpdateColumnCommand request, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Start updating {Column} with {Id} in UpdateHandler.",
+        logger.LogInformation("Start updating {Column} with {Id} in UpdateHandler.",
             typeof(Column).Name, request.Id);
         Column column = request.ToModel();
-        Column result = await _repository.Update(column, SqlStatements.ForColumns.Update);
-        _logger.LogInformation("Successfully completed updating {Column} with {Id} in EntityRepository.",
+        Column result = await repository.Update(column, SqlStatements.ForColumns.Update);
+        logger.LogInformation("Successfully completed updating {Column} with {Id} in EntityRepository.",
             typeof(Column).Name, request.Id);
 
         return result.ToDto();

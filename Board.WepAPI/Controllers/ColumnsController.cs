@@ -9,10 +9,10 @@ namespace Board.WepAPI.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class ColumnController(IMediator mediator, ILogger<ColumnController> logger) : ControllerBase
+public class ColumnsController(IMediator mediator, ILogger<ColumnsController> logger) : ControllerBase
 {
     private readonly IMediator _mediator = mediator;
-    private readonly ILogger<ColumnController> _logger = logger;
+    private readonly ILogger<ColumnsController> _logger = logger;
 
     [HttpGet]
     public async Task<IEnumerable<ColumnResponseDto>> GetAllColumns()

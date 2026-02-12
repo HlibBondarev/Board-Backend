@@ -11,16 +11,13 @@ namespace Board.BusinessLogic.Features.ForColumn.Handlers;
 public class GetByIdHandler(IEntityRepositoryBase<int, Column> repository,
     ILogger<GetByIdHandler> logger) : IRequestHandler<GetColumnByIdQuery, ColumnResponseDto>
 {
-    private readonly IEntityRepositoryBase<int, Column> _repository = repository;
-    private readonly ILogger<GetByIdHandler> _logger = logger;
-
     public async Task<ColumnResponseDto> Handle(GetColumnByIdQuery request, CancellationToken ct)
     {
-        _logger.LogInformation("Start executing GetByIdQuery for {Column} with {Id} in GetByIdHandler.",
+        logger.LogInformation("Start executing GetByIdQuery for {Column} with {Id} in GetByIdHandler.",
             typeof(Column).Name, request.Id);
-        var column = await _repository.GetById(request.Id, SqlStatements.ForColumns.GetById);
+        var column = await repository.GetById(request.Id, SqlStatements.ForColumns.GetById);
         _ = column ?? throw new NotFoundException($"{typeof(Column).Name} with Id = {request.Id} not found");
-        _logger.LogInformation("Successfully completed executing GetByIdQuery for {Column} with {Id} in EntityRepository.",
+        logger.LogInformation("Successfully completed executing GetByIdQuery for {Column} with {Id} in EntityRepository.",
             typeof(Column).Name, column.Id);
 
         return column.ToDto();

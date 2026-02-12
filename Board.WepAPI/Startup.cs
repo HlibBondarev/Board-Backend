@@ -52,6 +52,12 @@ public static class Startup
 
         services.AddControllers();
 
+        services.AddCors(options => options.AddPolicy("AllowReactApp", builder =>
+            builder.AllowAnyMethod()
+                   .AllowAnyHeader()
+                   .WithOrigins("http://localhost:5173")
+                   .AllowCredentials()));
+
         services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme =
@@ -105,6 +111,8 @@ public static class Startup
         }
 
         app.UseRouting();
+
+        app.UseCors("AllowReactApp");
 
         app.UseAuthentication();
 

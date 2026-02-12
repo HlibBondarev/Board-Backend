@@ -9,13 +9,10 @@ namespace Board.BusinessLogic.Features.ForUser.Handlers;
 public class DeleteHandler(IEntityRepositoryBase<string, User> repository,
     ILogger<DeleteHandler> logger) : IRequestHandler<DeleteUserCommand, bool>
 {
-    private readonly IEntityRepositoryBase<string, User> _repository = repository;
-    private readonly ILogger<DeleteHandler> _logger = logger;
-
     public async Task<bool> Handle(DeleteUserCommand request, CancellationToken ct)
     {
-        _logger.LogInformation("Start deleting {User} with {Id} in DeleteHandler.", typeof(User).Name, request.Id);
+        logger.LogInformation("Start deleting {User} with {Id} in DeleteHandler.", typeof(User).Name, request.Id);
 
-        return await _repository.Delete(request.Id, SqlStatements.ForUsers.Delete);
+        return await repository.Delete(request.Id, SqlStatements.ForUsers.Delete);
     }
 }

@@ -5,14 +5,10 @@ using System.Text.Json;
 
 namespace Board.BusinessLogic.Services;
 
-public class CurrentUser : ICurrentUser
+public class CurrentUser(HttpClient httpClient) : ICurrentUser
 {
-    private readonly HttpClient _httpClient;
+    private readonly HttpClient _httpClient = httpClient;
 
-    public CurrentUser(HttpClient httpClient)
-    {
-        _httpClient = httpClient;
-    }
     public async Task<CreateUserCommand?> GetUserPropertiesFromClaims(string authorizationHeader)
     {
         var request = new HttpRequestMessage(HttpMethod.Get, "userinfo");

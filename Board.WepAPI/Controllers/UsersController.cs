@@ -10,10 +10,10 @@ namespace Board.WepAPI.Controllers;
 [Authorize]
 [Route("api/[controller]")]
 [ApiController]
-public class UserController(IMediator mediator, ILogger<UserController> logger) : ControllerBase
+public class UsersController(IMediator mediator, ILogger<UsersController> logger) : ControllerBase
 {
     private readonly IMediator _mediator = mediator;
-    private readonly ILogger<UserController> _logger = logger;
+    private readonly ILogger<UsersController> _logger = logger;
 
     [AllowAnonymous]
     [HttpGet]

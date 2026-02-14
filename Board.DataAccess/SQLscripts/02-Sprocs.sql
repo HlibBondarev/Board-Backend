@@ -109,7 +109,21 @@ AS
 BEGIN
 	SET NOCOUNT ON
 
-    SELECT Id, Name, Description, Position, UserId FROM Columns;
+    SELECT Id, Name, Description, Position, UserId FROM Columns ORDER BY Position;
+END;
+GO
+
+-- Get all columns belonging to a specific User
+CREATE PROCEDURE dbo.Column_GetColumnsByUser
+    @UserId VARCHAR(64)
+AS
+BEGIN
+    SET NOCOUNT ON; -- Prevents sending extra "rows affected" messages for speed
+
+    SELECT Id, Name, Description, Position, UserId
+    FROM Columns
+    WHERE UserId = @UserId
+    ORDER BY Position;
 END;
 GO
 
@@ -188,7 +202,24 @@ AS
 BEGIN
 	SET NOCOUNT ON
 
-    SELECT Id, Title, Description, DueDate, CreatedAt, PositionInColumn, ColumnId, CreatorId, AssigneeId FROM Issues;
+    SELECT Id, Title, Description, DueDate, CreatedAt, PositionInColumn, ColumnId, CreatorId, AssigneeId 
+    FROM Issues ORDER BY ColumnId, PositionInColumn;
+END;
+GO
+
+-- Get all issues for all columns belonging to a specific User
+CREATE PROCEDURE dbo.Issue_GetIssuesByColumnsForUsers
+    @UserId VARCHAR(64)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT i.Id, i.Title, i.Description, i.DueDate, i.CreatedAt, 
+           i.PositionInColumn, i.ColumnId, i.CreatorId, i.AssigneeId
+    FROM Issues i
+    INNER JOIN Columns c ON i.ColumnId = c.Id
+    WHERE c.UserId = @UserId
+    ORDER BY i.ColumnId, i.PositionInColumn;
 END;
 GO
 

@@ -14,7 +14,7 @@ public class EntityRepositoryBase<TKey, TEntity>(IConfiguration configuration) :
     private readonly string _connectionString = configuration["ConnectionStrings:DefaultConnection"]
         ?? throw new InvalidOperationException("DefaultConnection connection string is missing.");
 
-    public async Task<TEntity> Create(TEntity entity, string sql)
+    public async Task<TEntity> CreateOrUpdate(TEntity entity, string sql)
     {
         using (var connection = new SqlConnection(_connectionString))
         {
@@ -47,7 +47,7 @@ public class EntityRepositoryBase<TKey, TEntity>(IConfiguration configuration) :
         using var connection = new SqlConnection(_connectionString);
 
         await connection.OpenAsync();
-        var entity = await connection.QueryFirstOrDefaultAsync<TEntity>(
+        var entity = await connection.QueryFirstAsync<TEntity>(
             sql,
             new { Id = id }
         );
@@ -65,6 +65,7 @@ public class EntityRepositoryBase<TKey, TEntity>(IConfiguration configuration) :
             sql: sql,
             param: null
         );
+        _ = entities ?? throw new NotFoundException($"{typeof(TEntity).Name}s not found");
 
         return entities;
     }
@@ -82,33 +83,33 @@ public class EntityRepositoryBase<TKey, TEntity>(IConfiguration configuration) :
         return isExists;
     }
 
-    public async Task<TEntity> Update(TEntity entity, string sql)
-    {
-        using (var connection = new SqlConnection(_connectionString))
-        {
-            await connection.OpenAsync();
+    //public async Task<TEntity> CreateOrUpdate(TEntity entity, string sql)
+    //{
+    //    using (var connection = new SqlConnection(_connectionString))
+    //    {
+    //        await connection.OpenAsync();
 
-            using (var transaction = connection.BeginTransaction())
-            {
-                try
-                {
-                    var newEntity = await connection.QueryFirstAsync<TEntity>(
-                        sql,
-                        entity,
-                        transaction: transaction
-                    );
-                    transaction.Commit();
+    //        using (var transaction = connection.BeginTransaction())
+    //        {
+    //            try
+    //            {
+    //                var newEntity = await connection.QueryFirstAsync<TEntity>(
+    //                    sql,
+    //                    entity,
+    //                    transaction: transaction
+    //                );
+    //                transaction.Commit();
 
-                    return newEntity;
-                }
-                catch (Exception)
-                {
-                    transaction.Rollback();
-                    throw;
-                }
-            }
-        }
-    }
+    //                return newEntity;
+    //            }
+    //            catch (Exception)
+    //            {
+    //                transaction.Rollback();
+    //                throw;
+    //            }
+    //        }
+    //    }
+    //}
 
     public async Task<bool> Delete(TKey id, string sql)
     {
@@ -121,5 +122,20 @@ public class EntityRepositoryBase<TKey, TEntity>(IConfiguration configuration) :
         );
 
         return true;
+    }
+
+    public async Task QueryMultipleAsync(
+        string sql,
+        object? parameters,
+        Func<GridReader, Task> readFunc)
+    {
+        using var connection = new SqlConnection(_connectionString);
+        await connection.OpenAsync();
+
+        // QueryMultiple is the most efficient way to handle multiple result sets in Dapper
+        using var multi = await connection.QueryMultipleAsync(sql, parameters);
+
+        // Execute the provided async reading logic
+        await readFunc(multi);
     }
 }

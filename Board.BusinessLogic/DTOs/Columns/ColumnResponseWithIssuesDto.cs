@@ -8,5 +8,6 @@ public record ColumnResponseWithIssuesDto(
     string Description,
     int Position,
     string UserId,
-    List<IssueResponseDto> Issues
+    string UserDisplayName,
+    List<IssueWithUserNameResponseDto> Issues
     );

@@ -40,21 +40,21 @@ GO
 
 -- 5. Populate Columns table
 INSERT INTO Columns (Name, Description, Position, UserId) VALUES
-('ToDo', 'For work in ToDo', 1, 'auth0|698b956080889e5401cef7c5'),
-('In Progress', 'For work in Progres', 2, 'auth0|698b956080889e5401cef7c5'),
-('Testing', 'For work in Testing', 3, 'auth0|698b9bd69f764e2999518960'),
-('Done', 'For work is Done', 4, 'auth0|698b9bd69f764e2999518960'),
-('Archived', 'For work is Archived', 5, 'auth0|698b9bd69f764e2999518960');
+('ToDo', 'For work in ToDo', 0, 'auth0|698b956080889e5401cef7c5'),
+('In Progress', 'For work in Progres', 1, 'auth0|698b956080889e5401cef7c5'),
+('Testing', 'For work in Testing', 2, 'auth0|698b9bd69f764e2999518960'),
+('Done', 'For work is Done', 3, 'auth0|698b9bd69f764e2999518960'),
+('Archived', 'For work is Archived', 4, 'auth0|698b9bd69f764e2999518960');
 GO
 
 -- 6. Populate Issues table
 INSERT INTO Issues (Title, Description, DueDate, CreatedAt, PositionInColumn, ColumnId, CreatorId, AssigneeId) VALUES
-('Design UI wireframes', 'Create initial design wireframes for the new application interface.', '2025-03-10', SYSDATETIME(), 1, 1, 'auth0|698b956080889e5401cef7c5', 'auth0|698b9bd69f764e2999518960'),
-('Set up database', 'Configure MSSQL database and create necessary tables and constraints.', NULL, SYSDATETIME(), 1, 2, 'auth0|698b9bd69f764e2999518960', 'auth0|698b956080889e5401cef7c5'),
-('Develop User model', 'Write the C# class for the User entity with Dapper integration.', '2025-03-15', SYSDATETIME(), 1, 2, 'auth0|698b956080889e5401cef7c5', 'auth0|698b956080889e5401cef7c5'),
-('Implement task creation', 'Develop functionality for creating new tasks via the API endpoint.', '2025-03-20', SYSDATETIME(), 1, 3, 'auth0|698b9bd69f764e2999518960', 'auth0|698b9bd69f764e2999518960'),
-('Testing user login', 'Perform unit and integration tests for the user authentication module.', NULL, SYSDATETIME(), 2, 3, 'auth0|698b956080889e5401cef7c5', 'auth0|698b956080889e5401cef7c5'),
-('Fix bug in column sorting', 'Resolve an issue where columns are not sorted correctly in the UI.', '2025-03-05', SYSDATETIME(), 1, 4, 'auth0|698b9bd69f764e2999518960', NULL),
-('Write API documentation', 'Document all API endpoints for tasks using Swagger.', '2025-03-25', SYSDATETIME(), 2, 4, 'auth0|698b956080889e5401cef7c5', 'auth0|698b9bd69f764e2999518960'),
-('Plan next sprint', 'Hold a meeting to plan the tasks for the next development sprint.', NULL, SYSDATETIME(), 3, 1, 'auth0|698b956080889e5401cef7c5', 'auth0|698b956080889e5401cef7c5');
+('Design UI wireframes', 'Create initial design wireframes for the new application interface.', '2025-03-10', SYSDATETIME(), 0, 1, 'auth0|698b956080889e5401cef7c5', 'auth0|698b9bd69f764e2999518960'),
+('Set up database', 'Configure MSSQL database and create necessary tables and constraints.', NULL, SYSDATETIME(), 0, 2, 'auth0|698b9bd69f764e2999518960', 'auth0|698b956080889e5401cef7c5'),
+('Develop User model', 'Write the C# class for the User entity with Dapper integration.', '2025-03-15', SYSDATETIME(), 1, 1, 'auth0|698b956080889e5401cef7c5', 'auth0|698b956080889e5401cef7c5'),
+('Implement task creation', 'Develop functionality for creating new tasks via the API endpoint.', '2025-03-20', SYSDATETIME(), 0, 3, 'auth0|698b9bd69f764e2999518960', 'auth0|698b9bd69f764e2999518960'),
+('Testing user login', 'Perform unit and integration tests for the user authentication module.', NULL, SYSDATETIME(), 1, 3, 'auth0|698b956080889e5401cef7c5', 'auth0|698b956080889e5401cef7c5'),
+('Fix bug in column sorting', 'Resolve an issue where columns are not sorted correctly in the UI.', '2025-03-05', SYSDATETIME(), 0, 4, 'auth0|698b9bd69f764e2999518960', NULL),
+('Write API documentation', 'Document all API endpoints for tasks using Swagger.', '2025-03-25', SYSDATETIME(), 1, 4, 'auth0|698b956080889e5401cef7c5', 'auth0|698b9bd69f764e2999518960'),
+('Plan next sprint', 'Hold a meeting to plan the tasks for the next development sprint.', NULL, SYSDATETIME(), 2, 1, 'auth0|698b956080889e5401cef7c5', 'auth0|698b956080889e5401cef7c5');
 GO

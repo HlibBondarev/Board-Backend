@@ -15,7 +15,7 @@ public class UpdateHandler(IEntityRepositoryBase<int, Issue> repository,
         logger.LogInformation("Start updating {Issue} with {Id} in UpdateHandler.",
             typeof(Issue).Name, request.Id);
         Issue issue = request.ToModel();
-        Issue result = await repository.Update(issue, SqlStatements.ForIssues.Update);
+        Issue result = await repository.CreateOrUpdate(issue, SqlStatements.ForIssues.Update);
         logger.LogInformation("Successfully completed updating {Issue} with {Id} in EntityRepository.",
             typeof(Issue).Name, request.Id);
 

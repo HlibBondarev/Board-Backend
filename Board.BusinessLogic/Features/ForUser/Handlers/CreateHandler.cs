@@ -14,7 +14,7 @@ public class CreateHandler(IEntityRepositoryBase<string, User> repository,
     {
         logger.LogInformation("Start creating {User} in CreateHandler.", typeof(User).Name);
         User user = request.ToModel();
-        User result = await repository.Create(user, SqlStatements.ForUsers.Create);
+        User result = await repository.CreateOrUpdate(user, SqlStatements.ForUsers.Create);
         logger.LogInformation("Successfully completed creating {User} with {Id} in EntityRepository.",
             typeof(User).Name, result.Id);
 

@@ -2,4 +2,4 @@
 
 namespace Board.BusinessLogic.Features.ForColumn.Commands;
 
-public record DeleteColumnCommand(int Id) : IRequest<bool>;
+public record DeleteColumnCommand(long Id) : IRequest<bool>;

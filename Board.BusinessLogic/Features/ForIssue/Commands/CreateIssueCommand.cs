@@ -22,7 +22,7 @@ public record CreateIssueCommand(
     int PositionInColumn,
 
     [Required]
-    int ColumnId,
+    long ColumnId,
 
     [Required]
     string CreatorId,

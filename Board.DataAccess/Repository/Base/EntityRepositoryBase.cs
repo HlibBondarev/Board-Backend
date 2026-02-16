@@ -7,14 +7,14 @@ using static Dapper.SqlMapper;
 
 namespace Board.DataAccess.Repository.Base;
 
-public class EntityRepositoryBase<TKey, TEntity>(IConfiguration configuration) : IEntityRepositoryBase<TKey, TEntity>
+public abstract class EntityRepositoryBase<TKey, TEntity>(IConfiguration configuration)
     where TEntity : class, IKeyedEntity<TKey>, new()
     where TKey : IEquatable<TKey>
 {
     private readonly string _connectionString = configuration["ConnectionStrings:DefaultConnection"]
         ?? throw new InvalidOperationException("DefaultConnection connection string is missing.");
 
-    public async Task<TEntity> CreateOrUpdate(TEntity entity, string sql)
+    protected internal async Task<TEntity> CreateOrUpdate(TEntity entity, string sql)
     {
         using (var connection = new SqlConnection(_connectionString))
         {
@@ -42,7 +42,7 @@ public class EntityRepositoryBase<TKey, TEntity>(IConfiguration configuration) :
         }
     }
 
-    public async Task<TEntity> GetById(TKey id, string sql)
+    protected internal async Task<TEntity> GetById(TKey id, string sql)
     {
         using var connection = new SqlConnection(_connectionString);
 
@@ -56,7 +56,7 @@ public class EntityRepositoryBase<TKey, TEntity>(IConfiguration configuration) :
         return entity;
     }
 
-    public async Task<IEnumerable<TEntity>> GetAll(string sql)
+    protected internal async Task<IEnumerable<TEntity>> GetAll(string sql)
     {
         using var connection = new SqlConnection(_connectionString);
 
@@ -70,7 +70,7 @@ public class EntityRepositoryBase<TKey, TEntity>(IConfiguration configuration) :
         return entities;
     }
 
-    public async Task<bool> Any(TKey id, string sql)
+    protected internal async Task<bool> Any(TKey id, string sql)
     {
         using var connection = new SqlConnection(_connectionString);
 
@@ -83,35 +83,7 @@ public class EntityRepositoryBase<TKey, TEntity>(IConfiguration configuration) :
         return isExists;
     }
 
-    //public async Task<TEntity> CreateOrUpdate(TEntity entity, string sql)
-    //{
-    //    using (var connection = new SqlConnection(_connectionString))
-    //    {
-    //        await connection.OpenAsync();
-
-    //        using (var transaction = connection.BeginTransaction())
-    //        {
-    //            try
-    //            {
-    //                var newEntity = await connection.QueryFirstAsync<TEntity>(
-    //                    sql,
-    //                    entity,
-    //                    transaction: transaction
-    //                );
-    //                transaction.Commit();
-
-    //                return newEntity;
-    //            }
-    //            catch (Exception)
-    //            {
-    //                transaction.Rollback();
-    //                throw;
-    //            }
-    //        }
-    //    }
-    //}
-
-    public async Task<bool> Delete(TKey id, string sql)
+    protected internal async Task<bool> Delete(TKey id, string sql)
     {
         using var connection = new SqlConnection(_connectionString);
 
@@ -124,7 +96,7 @@ public class EntityRepositoryBase<TKey, TEntity>(IConfiguration configuration) :
         return true;
     }
 
-    public async Task QueryMultipleAsync(
+    protected internal async Task QueryMultipleAsync(
         string sql,
         object? parameters,
         Func<GridReader, Task> readFunc)
@@ -137,5 +109,37 @@ public class EntityRepositoryBase<TKey, TEntity>(IConfiguration configuration) :
 
         // Execute the provided async reading logic
         await readFunc(multi);
+    }
+
+    protected internal async Task ExecuteCommandAsync(string sql, Dictionary<string, object> parameters)
+    {
+        var dbArgs = new DynamicParameters();
+        foreach (var pair in parameters)
+        {
+            dbArgs.Add(pair.Key, pair.Value);
+        }
+
+        using (var connection = new SqlConnection(_connectionString))
+        {
+            await connection.OpenAsync();
+
+            using var transaction = connection.BeginTransaction();
+            try
+            {
+                await connection.ExecuteAsync(
+                    sql: sql,
+                    param: dbArgs,
+                    transaction: transaction
+                );
+                transaction.Commit();
+
+                return;
+            }
+            catch (Exception)
+            {
+                transaction.Rollback();
+                throw;
+            }
+        }
     }
 }

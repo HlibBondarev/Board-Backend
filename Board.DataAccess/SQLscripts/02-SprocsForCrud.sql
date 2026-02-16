@@ -94,7 +94,7 @@ GO
 
 -- GetSingle
 CREATE PROCEDURE dbo.Column_GetSingle
-    @Id INT
+    @Id BIGINT
 AS
 BEGIN
 	SET NOCOUNT ON
@@ -128,7 +128,7 @@ END;
 GO
 
 -- Any
-CREATE PROCEDURE dbo.Column_Any @Id INT
+CREATE PROCEDURE dbo.Column_Any @Id BIGINT
 AS
 BEGIN
 	SET NOCOUNT ON
@@ -139,7 +139,7 @@ GO
 
 -- Put (Update)
 CREATE PROCEDURE dbo.Column_Put
-    @Id INT,
+    @Id BIGINT,
     @Name NVARCHAR(50),
 	@Description NVARCHAR(200),
     @Position INT,
@@ -154,7 +154,7 @@ END;
 GO
 
 -- Delete
-CREATE PROCEDURE dbo.Column_Delete @Id INT
+CREATE PROCEDURE dbo.Column_Delete @Id BIGINT
 AS
 BEGIN
 	SET NOCOUNT ON
@@ -170,8 +170,8 @@ CREATE PROCEDURE dbo.Issue_Post
     @Description NVARCHAR(2000),
     @DueDate DATETIME2,
     @CreatedAt DATETIME2,
-	@PositionInColumn INT,
-    @ColumnId INT,
+	@PositionInColumn BIGINT,
+    @ColumnId BIGINT,
     @CreatorId VARCHAR(64),
     @AssigneeId VARCHAR(64)
 AS
@@ -187,7 +187,7 @@ GO
 
 -- GetSingle
 CREATE PROCEDURE dbo.Issue_GetSingle
-    @Id INT
+    @Id BIGINT
 AS
 BEGIN
 	SET NOCOUNT ON
@@ -224,7 +224,7 @@ END;
 GO
 
 -- Any
-CREATE PROCEDURE dbo.Issue_Any @Id INT
+CREATE PROCEDURE dbo.Issue_Any @Id BIGINT
 AS
 BEGIN
 	SET NOCOUNT ON
@@ -235,13 +235,13 @@ GO
 
 -- Put (Update)
 CREATE PROCEDURE dbo.Issue_Put
-    @Id INT,
+    @Id BIGINT,
     @Title NVARCHAR(200),
     @Description NVARCHAR(2000),
     @DueDate DATETIME2,
     @CreatedAt DATETIME2,
-	@PositionInColumn INT,
-    @ColumnId INT,
+	@PositionInColumn BIGINT,
+    @ColumnId BIGINT,
     @CreatorId VARCHAR(64),
     @AssigneeId VARCHAR(64)
 AS
@@ -258,7 +258,7 @@ END;
 GO
 
 -- Delete
-CREATE PROCEDURE dbo.Issue_Delete @Id INT
+CREATE PROCEDURE dbo.Issue_Delete @Id BIGINT
 AS
 BEGIN
 	SET NOCOUNT ON

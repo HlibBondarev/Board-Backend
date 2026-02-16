@@ -8,7 +8,7 @@ namespace Board.BusinessLogic.Features.ForColumn.Commands;
 
 public record UpdateColumnCommand(
     [Required]
-    int Id,
+    long Id,
 
     [Required]
     [StringLength(50, MinimumLength = 3)]

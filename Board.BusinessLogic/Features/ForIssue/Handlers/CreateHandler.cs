@@ -2,22 +2,24 @@
 using Board.BusinessLogic.DTOs.Issues;
 using Board.BusinessLogic.Features.ForIssue.Commands;
 using Board.DataAccess.Models;
-using Board.DataAccess.Repository.Base;
+using Board.DataAccess.Repository.Api;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Board.BusinessLogic.Features.ForIssue.Handlers;
 
-public class CreateHandler(IEntityRepositoryBase<int, Issue> repository,
+public class CreateHandler(
+    IIssueRepository repository,
     ILogger<CreateHandler> logger) : IRequestHandler<CreateIssueCommand, IssueResponseDto>
 {
     public async Task<IssueResponseDto> Handle(CreateIssueCommand request, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Start creating {Issue} in CreateHandler.", typeof(Issue).Name);
+        logger.LogInformation("Start creating {Issue} in {CreateHandler}.",
+            typeof(Issue).Name, typeof(CreateHandler));
         Issue issue = request.ToModel();
-        Issue result = await repository.CreateOrUpdate(issue, SqlStatements.ForIssues.Create);
-        logger.LogInformation("Successfully completed creating {Issue} with {Id} in EntityRepository.",
-            typeof(Issue).Name, result.Id);
+        Issue result = await repository.Create(issue);
+        logger.LogInformation("Successfully completed creating {Issue} with {Id} in {IssueRepository}.",
+            typeof(Issue).Name, result.Id, typeof(IIssueRepository));
 
         return result.ToDto();
     }

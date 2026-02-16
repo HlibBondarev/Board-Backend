@@ -3,9 +3,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Board.DataAccess.Models;
 
-public class Column : IKeyedEntity<int>
+public class Column : IKeyedEntity<long>
 {
-    public int Id { get; init; }
+    public long Id { get; init; }
 
     [Required]
     [StringLength(50, MinimumLength = 3)]

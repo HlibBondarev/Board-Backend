@@ -1,7 +1,7 @@
-﻿using Board.BusinessLogic.Features;
-using Board.BusinessLogic.Services;
+﻿using Board.BusinessLogic.Services;
 using Board.BusinessLogic.Services.Api;
-using Board.DataAccess.Repository.Base;
+using Board.DataAccess.Repository;
+using Board.DataAccess.Repository.Api;
 using Board.WepAPI.Authorization;
 using Board.WepAPI.Middleware;
 using DbUp;
@@ -35,7 +35,7 @@ public static class Startup
 
         var upgrader = DeployChanges.To
             .SqlDatabase(connectionString, null)
-            .WithScriptsEmbeddedInAssembly(typeof(EntityRepositoryBase<,>).Assembly)
+            .WithScriptsEmbeddedInAssembly(typeof(IUserRepository).Assembly)
             .WithTransaction()
             .LogToConsole()
             .Build();
@@ -48,7 +48,7 @@ public static class Startup
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         services.AddOpenApi();
 
-        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(SqlStatements).Assembly));
+        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(ICurrentUser).Assembly));
 
         services.AddControllers();
 
@@ -87,7 +87,9 @@ public static class Startup
         });
 
         //services.AddScoped(typeof(IEntityRepositoryBase<,>), typeof(EntityRepositoryBase<,>));
-        services.AddTransient(typeof(IEntityRepositoryBase<,>), typeof(EntityRepositoryBase<,>));
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IColumnRepository, ColumnRepository>();
+        services.AddScoped<IIssueRepository, IssueRepository>();
     }
 
     public static void Configure(this WebApplication app)

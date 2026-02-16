@@ -8,7 +8,7 @@ namespace Board.BusinessLogic.Features.ForIssue.Commands;
 
 public record UpdateIssueCommand(
     [Required]
-    int Id,
+    long Id,
 
     [Required]
     [StringLength(200, MinimumLength = 3)]
@@ -28,7 +28,7 @@ public record UpdateIssueCommand(
     int PositionInColumn,
 
     [Required]
-    int ColumnId,
+    long ColumnId,
 
     [Required]
     string CreatorId,

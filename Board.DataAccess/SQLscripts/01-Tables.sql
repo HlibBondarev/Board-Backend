@@ -9,7 +9,7 @@ GO
 
 -- 2. Create Columns table
 CREATE TABLE Columns (
-    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Id BIGINT IDENTITY(1,1) PRIMARY KEY,
     Name NVARCHAR(50) NOT NULL CHECK (LEN(Name) >= 3),
     Description NVARCHAR(200) NOT NULL CHECK (LEN(Description) >= 10),
 	Position INT NOT NULL,
@@ -19,13 +19,13 @@ GO
 
 -- 3. Create Issues table
 CREATE TABLE Issues (
-    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Id BIGINT IDENTITY(1,1) PRIMARY KEY,
     Title NVARCHAR(200) NOT NULL CHECK (LEN(Title) >= 3),
     Description NVARCHAR(2000) NOT NULL CHECK (LEN(Description) >= 10),
     DueDate DATETIME2 NULL,
     CreatedAt DATETIME2 NOT NULL,
-    PositionInColumn INT NOT NULL,
-	ColumnId INT NOT NULL FOREIGN KEY REFERENCES Columns(Id),
+    PositionInColumn BIGINT NOT NULL,
+	ColumnId BIGINT NOT NULL FOREIGN KEY REFERENCES Columns(Id),
     CreatorId VARCHAR(64) NOT NULL FOREIGN KEY REFERENCES Users(Id),
     AssigneeId VARCHAR(64) NULL FOREIGN KEY REFERENCES Users(Id)
 );

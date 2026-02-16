@@ -1,4 +1,4 @@
-﻿namespace Board.BusinessLogic.Features;
+﻿namespace Board.DataAccess.Repository;
 
 public static class SqlStatements
 {
@@ -33,7 +33,7 @@ public static class SqlStatements
         public const string Delete =
             @"EXEC dbo.Column_Delete @Id = @Id";
         public const string GetIssuesByColumnsForUsers =
-            @"EXEC dbo.Column_GetAll; EXEC dbo.Issue_GetAll; EXEC dbo.User_GetAll;";
+           @"EXEC dbo.Column_GetAll; EXEC dbo.Issue_GetAll; EXEC dbo.User_GetAll;";
     }
 
     public static class ForIssues
@@ -56,5 +56,8 @@ public static class SqlStatements
             @CreatorId = @CreatorId, @AssigneeId = @AssigneeId";
         public const string Delete =
             @"EXEC dbo.Issue_Delete @Id = @Id";
+        public const string MoveIssue = @"EXEC dbo.Issue_Move
+        @IssueId = @IssueId, @TargetColumnId = @TargetColumnId,
+        @NewPosition = @NewPosition";
     }
 }

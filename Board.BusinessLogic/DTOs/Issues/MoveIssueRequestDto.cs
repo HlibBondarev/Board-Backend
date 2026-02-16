@@ -2,6 +2,6 @@
 
 public record MoveIssueRequestDto(
 
-    int ColumnId,
+    long ColumnId,
     int Position
 );

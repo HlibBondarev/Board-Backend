@@ -9,15 +9,16 @@ namespace Board.WepAPI.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class ColumnsController(IMediator mediator, ILogger<ColumnsController> logger) : ControllerBase
+public class ColumnsController(
+    IMediator mediator,
+    ILogger<ColumnsController> logger) : ControllerBase
 {
-    private readonly IMediator _mediator = mediator;
-    private readonly ILogger<ColumnsController> _logger = logger;
-
     [HttpGet]
-    public async Task<IEnumerable<ColumnResponseWithIssuesDto>> GetAllColumns()
+    public async Task<IEnumerable<ColumnWithIssuesAndUserResponseDto>> GetAllColumns()
     {
-        var columns = await _mediator.Send(new GetAllColumnsWithIssuesQuery());
+        logger.LogInformation("Start  GetAllColumns action in {ColumnsController}.",
+            typeof(ColumnsController));
+        var columns = await mediator.Send(new GetAllColumnsWithIssuesAndUserQuery());
 
         return columns ?? [];
     }
@@ -25,7 +26,7 @@ public class ColumnsController(IMediator mediator, ILogger<ColumnsController> lo
     [HttpGet("{columnId}")]
     public async Task<ActionResult<ColumnResponseDto>> GetColumn(int columnId)
     {
-        var column = await _mediator.Send(new GetColumnByIdQuery(columnId));
+        var column = await mediator.Send(new GetColumnByIdQuery(columnId));
         if (column == null)
         {
             return NotFound();
@@ -38,7 +39,7 @@ public class ColumnsController(IMediator mediator, ILogger<ColumnsController> lo
     [HttpPost]
     public async Task<ActionResult<ColumnResponseDto>> Create(CreateColumnCommand command)
     {
-        var createdColumn = await _mediator.Send(command);
+        var createdColumn = await mediator.Send(command);
 
         return CreatedAtAction(nameof(GetColumn), new
         {
@@ -50,12 +51,12 @@ public class ColumnsController(IMediator mediator, ILogger<ColumnsController> lo
     [HttpPut("{columnId}")]
     public async Task<ActionResult<ColumnResponseDto>> Update(int columnId, UpdateColumnCommand command)
     {
-        var column = await _mediator.Send(new GetColumnByIdQuery(columnId));
+        var column = await mediator.Send(new GetColumnByIdQuery(columnId));
         if (column == null)
         {
             return NotFound();
         }
-        var savedColumn = await _mediator.Send(command);
+        var savedColumn = await mediator.Send(command);
 
         return savedColumn;
     }
@@ -64,12 +65,12 @@ public class ColumnsController(IMediator mediator, ILogger<ColumnsController> lo
     [HttpDelete("{columnId}")]
     public async Task<IActionResult> Delete(int columnId)
     {
-        var column = await _mediator.Send(new GetColumnByIdQuery(columnId));
+        var column = await mediator.Send(new GetColumnByIdQuery(columnId));
         if (column == null)
         {
             return NotFound();
         }
-        await _mediator.Send(new DeleteColumnCommand(columnId));
+        await mediator.Send(new DeleteColumnCommand(columnId));
 
         return NoContent();
     }

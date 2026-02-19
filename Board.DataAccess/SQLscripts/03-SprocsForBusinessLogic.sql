@@ -1,5 +1,6 @@
 ﻿-- Issue ---------------------------------------------------------------------------------
--- Move
+-- Move an issue to a different position within the same column or to a different column, 
+-- ensuring that the order of issues is maintained correctly in both source and target columns.
 CREATE PROCEDURE dbo.Issue_Move
     @IssueId BIGINT,
     @TargetColumnId BIGINT,
@@ -75,3 +76,45 @@ BEGIN
         THROW;
     END CATCH
 END
+GO
+
+-- Get all issues belonging to a specific Column
+CREATE PROCEDURE dbo.Issue_GetIssuesByColumn
+    @ColumnId BIGINT
+AS
+BEGIN
+	SET NOCOUNT ON
+
+    SELECT * FROM Issues WHERE ColumnId = @ColumnId;
+END
+GO
+
+-- Re order issues in a column after an issue has been removed or moved out of the column, 
+-- ensuring that the PositionInColumn values are contiguous and correctly reflect the new 
+-- order of issues within the column.
+
+CREATE PROCEDURE dbo.Issue_ReorderInColumn
+    @IssuePosition INT,
+    @ColumnId BIGINT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRANSACTION;
+    BEGIN TRY
+        BEGIN
+        -- Moving forward (down): shift intermediate items back (up)
+        UPDATE Issues
+        SET PositionInColumn = PositionInColumn - 1
+        WHERE ColumnId = @ColumnId 
+        AND PositionInColumn > @IssuePosition;
+        END
+    COMMIT TRANSACTION;
+    END TRY
+    
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
+        THROW;
+    END CATCH
+END
+GO

@@ -15,7 +15,8 @@ public class UpdateHandler(
     {
         logger.LogInformation("Start updating {Issue} with {Id} in {UpdateHandler}.",
             typeof(Issue).Name, request.Id, typeof(UpdateHandler));
-        Issue issue = request.ToModel();
+        Issue issue = await repository.GetById(request.Id);
+        request.SetToModel(issue);
         Issue result = await repository.Update(issue);
         logger.LogInformation("Successfully completed updating {Issue} with {Id} in {IssueRepository}.",
             typeof(Issue).Name, request.Id, typeof(IIssueRepository));

@@ -9,5 +9,5 @@ public record ColumnWithIssuesAndUserResponseDto(
     int Position,
     string UserId,
     string UserDisplayName,
-    List<IssueByColumnWithUserResponseDto> Issues
+    List<IssueWithUserByColumnsResponseDto> Issues
     );

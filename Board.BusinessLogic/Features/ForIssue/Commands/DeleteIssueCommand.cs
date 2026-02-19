@@ -1,5 +1,6 @@
-﻿using MediatR;
+﻿using Board.BusinessLogic.DTOs.Issues;
+using MediatR;
 
 namespace Board.BusinessLogic.Features.ForIssue.Commands;
 
-public record DeleteIssueCommand(int Id) : IRequest<bool>;
+public record DeleteIssueCommand(int Id) : IRequest<IssuesByColumnIdResponseDto>;

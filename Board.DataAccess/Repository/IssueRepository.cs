@@ -38,4 +38,17 @@ public class IssueRepository(IConfiguration configuration) : EntityRepositoryBas
 
         return true;
     }
+
+    public async Task<bool> ReorderIssuesInColumnAsync(long issuePosition, long columnId)
+    {
+        var parameters = new Dictionary<string, object>
+        {
+            { "IssuePosition", issuePosition },
+            { "ColumnId", columnId }
+        };
+
+        await ExecuteCommandAsync(SqlStatements.ForIssues.ReorderIssuesInColumn, parameters);
+
+        return true;
+    }
 }

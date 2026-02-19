@@ -1,8 +1,8 @@
-﻿using Board.BusinessLogic.DTOs.Columns;
-using Board.BusinessLogic.DTOs.Issues;
+﻿using Board.BusinessLogic.DTOs.Issues;
 using Board.BusinessLogic.Features.ForIssue.Commands;
 using Board.DataAccess.Models;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Board.WepAPI.Controllers;
@@ -13,9 +13,37 @@ public class IssuesController(
     IMediator mediator,
     ILogger<ColumnsController> logger) : ControllerBase
 {
+    [Authorize]
+    [HttpPost]
+    public async Task<ActionResult<IssueResponseDto>> Create(CreateIssueCommand command)
+    {
+        var result = await mediator.Send(command);
+
+        return Ok(result);
+    }
+
+    [Authorize]
+    [HttpPut]
+    public async Task<ActionResult<IssueResponseDto>> Update(UpdateIssueCommand command)
+    {
+        var result = await mediator.Send(command);
+
+        return Ok(result);
+    }
+
+    [Authorize]
+    [HttpDelete]
+    [Route("{id}")]
+    public async Task<ActionResult<IssuesByColumnIdResponseDto>> Delete(int id)
+    {
+        var result = await mediator.Send(new DeleteIssueCommand(id));
+
+        return Ok(result);
+    }
+
     [HttpPatch]
     [Route("{id}/move")]
-    public async Task<ActionResult<ColumnResponseDto>> MoveIssue(int id, [FromBody] MoveIssueRequestDto dto)
+    public async Task<ActionResult> MoveIssue(long id, [FromBody] MoveIssueRequestDto dto)
     {
         logger.LogInformation("Start  moving {Issue} with {id} in MoveIssue action in {ColumnsController}.",
             typeof(Issue), id, typeof(ColumnsController));

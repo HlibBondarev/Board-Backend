@@ -111,7 +111,30 @@ public abstract class EntityRepositoryBase<TKey, TEntity>(IConfiguration configu
         await readFunc(multi);
     }
 
-    protected internal async Task ExecuteCommandAsync(string sql, Dictionary<string, object> parameters)
+    protected internal async Task<IEnumerable<TEntity>> QueryAsync(
+        string sql,
+        Dictionary<string, object> parameters)
+    {
+        var dbArgs = new DynamicParameters();
+        foreach (var pair in parameters)
+        {
+            dbArgs.Add(pair.Key, pair.Value);
+        }
+
+        using var connection = new SqlConnection(_connectionString);
+
+        await connection.OpenAsync();
+        var entities = await connection.QueryAsync<TEntity>(
+            sql: sql,
+            param: dbArgs
+        );
+
+        return entities;
+    }
+
+    protected internal async Task ExecuteCommandAsync(
+        string sql,
+        Dictionary<string, object> parameters)
     {
         var dbArgs = new DynamicParameters();
         foreach (var pair in parameters)

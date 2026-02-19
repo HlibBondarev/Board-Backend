@@ -239,19 +239,13 @@ CREATE PROCEDURE dbo.Issue_Put
     @Title NVARCHAR(200),
     @Description NVARCHAR(2000),
     @DueDate DATETIME2,
-    @CreatedAt DATETIME2,
-	@PositionInColumn BIGINT,
-    @ColumnId BIGINT,
-    @CreatorId VARCHAR(64),
     @AssigneeId VARCHAR(64)
 AS
 BEGIN
 	SET NOCOUNT ON
 
     UPDATE Issues 
-    SET Title = @Title, Description = @Description, DueDate = @DueDate,
-		CreatedAt = @CreatedAt, PositionInColumn = @PositionInColumn,
-        ColumnId = @ColumnId, CreatorId = @CreatorId, AssigneeId = @AssigneeId
+    SET Title = @Title, Description = @Description, DueDate = @DueDate, AssigneeId = @AssigneeId
     WHERE Id = @Id;
     SELECT * FROM Issues WHERE Id = @Id;
 END;

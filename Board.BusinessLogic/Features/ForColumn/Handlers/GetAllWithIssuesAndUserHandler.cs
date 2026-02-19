@@ -57,7 +57,7 @@ public class GetAllWithIssuesAndUserHandler(
                 GetDisplayName(c.UserId),
                 [.. issuesLookup[c.Id]
                     .OrderBy(i => i.PositionInColumn)
-                    .Select(i => new IssueByColumnWithUserResponseDto(
+                    .Select(i => new IssueWithUserByColumnsResponseDto(
                         i.Id,
                         i.Title,
                         i.Description,

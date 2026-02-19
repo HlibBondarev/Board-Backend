@@ -32,7 +32,7 @@ public class ColumnRepository(IConfiguration configuration) : EntityRepositoryBa
         IEnumerable<User> users = [];
 
         // 1. Fetch all raw data sets in ONE round-trip to the database
-        await QueryMultipleAsync(SqlStatements.ForColumns.GetIssuesByColumnsForUsers, null, async multi =>
+        await QueryMultipleAsync(SqlStatements.ForColumns.GetIssuesWithUserByColumns, null, async multi =>
         {
             //2. ReadAsync ensures the web server threads are not blocked during I/O
             columns = await multi.ReadAsync<Column>();

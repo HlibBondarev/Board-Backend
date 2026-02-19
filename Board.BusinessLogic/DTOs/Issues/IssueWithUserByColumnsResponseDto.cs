@@ -1,6 +1,6 @@
 ﻿namespace Board.BusinessLogic.DTOs.Issues;
 
-public record IssueByColumnWithUserResponseDto(
+public record IssueWithUserByColumnsResponseDto(
     long Id,
     string Title,
     string Description,

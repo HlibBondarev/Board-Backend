@@ -32,7 +32,7 @@ public static class SqlStatements
             @"EXEC dbo.Column_Put @Id = @Id, @Name = @Name, @Description = @Description, @Position = @Position, @UserId = @UserId";
         public const string Delete =
             @"EXEC dbo.Column_Delete @Id = @Id";
-        public const string GetIssuesByColumnsForUsers =
+        public const string GetIssuesWithUserByColumns =
            @"EXEC dbo.Column_GetAll; EXEC dbo.Issue_GetAll; EXEC dbo.User_GetAll;";
     }
 
@@ -50,14 +50,16 @@ public static class SqlStatements
         public const string Any =
             @"EXEC dbo.Issue_Any";
         public const string Update = @"EXEC dbo.Issue_Put 
-            @Title = @Title, @Description = @Description,
-            @DueDate = @DueDate, @CreatedAt = @CreatedAt,
-            @PositionInColumn = @PositionInColumn, @ColumnId = @ColumnId,
-            @CreatorId = @CreatorId, @AssigneeId = @AssigneeId";
+            @Id = @Id, @Title = @Title, @DueDate = @DueDate,
+            @Description = @Description, @AssigneeId = @AssigneeId";
         public const string Delete =
             @"EXEC dbo.Issue_Delete @Id = @Id";
         public const string MoveIssue = @"EXEC dbo.Issue_Move
         @IssueId = @IssueId, @TargetColumnId = @TargetColumnId,
         @NewPosition = @NewPosition";
+        public const string GetIssuesByColumnId =
+           @"EXEC dbo.Issue_GetIssuesByColumn @ColumnId = @ColumnId";
+        public const string ReorderIssuesInColumn = @"EXEC dbo.Issue_ReorderInColumn
+        @IssuePosition = @IssuePosition, @ColumnId = @ColumnId";
     }
 }

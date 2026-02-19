@@ -1,25 +1,24 @@
 ﻿using Board.BusinessLogic.DTOs.Users;
 using Board.BusinessLogic.Features.ForUser.Commands;
 using Board.DataAccess.Models;
-using Board.DataAccess.Repository.Base;
+using Board.DataAccess.Repository.Api;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Board.BusinessLogic.Features.ForUser.Handlers;
 
-public class CreateHandler(IEntityRepositoryBase<int, User> repository,
+public class CreateHandler(
+    IUserRepository repository,
     ILogger<CreateHandler> logger) : IRequestHandler<CreateUserCommand, UserResponseDto>
 {
-    private readonly IEntityRepositoryBase<int, User> _repository = repository;
-    private readonly ILogger<CreateHandler> _logger = logger;
-
     public async Task<UserResponseDto> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Start creating {User} in UpdateHandler.", typeof(User).Name);
+        logger.LogInformation("Start creating {User} in {CreateHandler}.",
+            typeof(User).Name, typeof(CreateHandler));
         User user = request.ToModel();
-        User result = await _repository.Create(user, SqlStatements.ForUsers.Create);
-        _logger.LogInformation("Successfully completed creating {User} with {Id} in EntityRepository.",
-            typeof(User).Name, result.Id);
+        User result = await repository.Create(user);
+        logger.LogInformation("Successfully completed creating {User} with {Id} in {UserRepository}.",
+            typeof(User).Name, result.Id, typeof(IUserRepository));
 
         return result.ToDto();
     }

@@ -1,5 +1,4 @@
 ﻿using Board.BusinessLogic.DTOs.Issues;
-using Board.Common.Extensions;
 using Board.DataAccess.Models;
 using MediatR;
 using System.ComponentModel.DataAnnotations;
@@ -8,7 +7,7 @@ namespace Board.BusinessLogic.Features.ForIssue.Commands;
 
 public record UpdateIssueCommand(
     [Required]
-    int Id,
+    long Id,
 
     [Required]
     [StringLength(200, MinimumLength = 3)]
@@ -21,36 +20,40 @@ public record UpdateIssueCommand(
     [DataType(DataType.Date)]
     DateTime? DueDate,
 
-    [Required]
-    DateTime CreatedAt,
+    //[Required]
+    //DateTime CreatedAt,
 
-    [Required]
-    int PositionInColumn,
+    //[Required]
+    //int PositionInColumn,
 
-    [Required]
-    int ColumnId,
+    //[Required]
+    //long ColumnId,
 
-    [Required]
-    int CreatorId,
+    //[Required]
+    //string CreatorId,
 
-    int? AssigneeId
+    string? AssigneeId
 ) : IRequest<IssueResponseDto>;
 
 public static class UpdateColumnCommandExtensions
 {
-    public static Issue ToModel(this UpdateIssueCommand dto) => new()
-    {
-        Id = dto.Id,
-        Title = dto.Title,
-        Description = dto.Description,
-        DueDate = dto.DueDate,
-        CreatedAt = dto.CreatedAt,
-        PositionInColumn = dto.PositionInColumn,
-        ColumnId = dto.ColumnId,
-        CreatorId = dto.CreatorId,
-        AssigneeId = dto.AssigneeId,
-    };
+    //public static Issue ToModel(this UpdateIssueCommand dto) => new()
+    //{
+    //    Id = dto.Id,
+    //    Title = dto.Title,
+    //    Description = dto.Description,
+    //    DueDate = dto.DueDate,
+    //    AssigneeId = dto.AssigneeId,
+    //};
 
-    public static List<Issue> ToModel(this IEnumerable<UpdateIssueCommand> list)
-        => list.MapToList(ToModel);
+    public static void SetToModel(this UpdateIssueCommand dto, Issue model)
+    {
+        model.Title = dto.Title;
+        model.Description = dto.Description;
+        model.DueDate = dto.DueDate;
+        model.AssigneeId = dto.AssigneeId;
+    }
+
+    //public static List<Issue> ToModel(this IEnumerable<UpdateIssueCommand> list)
+    //    => list.MapToList(ToModel);
 }

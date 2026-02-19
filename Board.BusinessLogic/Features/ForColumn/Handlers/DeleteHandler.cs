@@ -1,21 +1,20 @@
 ﻿using Board.BusinessLogic.Features.ForColumn.Commands;
 using Board.DataAccess.Models;
-using Board.DataAccess.Repository.Base;
+using Board.DataAccess.Repository.Api;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Board.BusinessLogic.Features.ForColumn.Handlers;
 
-public class DeleteHandler(IEntityRepositoryBase<int, Column> repository,
+public class DeleteHandler(
+    IColumnRepository repository,
     ILogger<DeleteHandler> logger) : IRequestHandler<DeleteColumnCommand, bool>
 {
-    private readonly IEntityRepositoryBase<int, Column> _repository = repository;
-    private readonly ILogger<DeleteHandler> _logger = logger;
-
     public async Task<bool> Handle(DeleteColumnCommand request, CancellationToken ct)
     {
-        _logger.LogInformation("Start deleting {Column} with {Id} in DeleteHandler.", typeof(Column).Name, request.Id);
+        logger.LogInformation("Start deleting {Column} with {Id} in {DeleteHandler}.",
+            typeof(Column).Name, request.Id, typeof(DeleteHandler).Name);
 
-        return await _repository.Delete(request.Id, SqlStatements.ForColumns.Delete);
+        return await repository.Delete(request.Id);
     }
 }

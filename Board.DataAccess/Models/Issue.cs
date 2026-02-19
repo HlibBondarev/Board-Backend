@@ -3,10 +3,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Board.DataAccess.Models;
 
-public class Issue : IKeyedEntity<int>
+public class Issue : IKeyedEntity<long>
 {
     [Required]
-    public int Id { get; init; }
+    public long Id { get; init; }
 
     [Required]
     [StringLength(200, MinimumLength = 3)]
@@ -24,14 +24,13 @@ public class Issue : IKeyedEntity<int>
     public DateTime CreatedAt { get; set; }
 
     [Required]
-    public int PositionInColumn { get; set; }
+    public long PositionInColumn { get; set; }
 
     [Required]
-    public int ColumnId { get; set; }
+    public long ColumnId { get; set; }
 
     [Required]
-    public int CreatorId { get; set; }
+    public string CreatorId { get; set; } = null!;
 
-    [Required]
-    public int? AssigneeId { get; set; }
+    public string? AssigneeId { get; set; }
 }

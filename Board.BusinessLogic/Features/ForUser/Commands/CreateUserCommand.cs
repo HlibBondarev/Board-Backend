@@ -3,10 +3,16 @@ using Board.Common.Extensions;
 using Board.DataAccess.Models;
 using MediatR;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Board.BusinessLogic.Features.ForUser.Commands;
 
 public record CreateUserCommand(
+    [Required]
+    [StringLength(64)]
+    [property: JsonPropertyName("sub")]
+    string Id,
+
     [Required]
     [EmailAddress]
     string Email,
@@ -20,6 +26,7 @@ public static class CreateUserCommandExtensions
 {
     public static User ToModel(this CreateUserCommand dto) => new()
     {
+        Id = dto.Id,
         Email = dto.Email,
         DisplayName = dto.DisplayName,
         CreatedAt = DateTime.UtcNow

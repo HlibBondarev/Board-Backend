@@ -2,4 +2,4 @@
 
 namespace Board.BusinessLogic.Features.ForUser.Commands;
 
-public record DeleteUserCommand(int Id) : IRequest<bool>;
+public record DeleteUserCommand(string Id) : IRequest<bool>;

@@ -1,26 +1,25 @@
 ﻿using Board.BusinessLogic.DTOs.Issues;
 using Board.BusinessLogic.Features.ForIssue.Commands;
 using Board.DataAccess.Models;
-using Board.DataAccess.Repository.Base;
+using Board.DataAccess.Repository.Api;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Board.BusinessLogic.Features.ForIssue.Handlers;
 
-public class UpdateHandler(IEntityRepositoryBase<int, Issue> repository,
+public class UpdateHandler(
+    IIssueRepository repository,
     ILogger<UpdateHandler> logger) : IRequestHandler<UpdateIssueCommand, IssueResponseDto>
 {
-    private readonly IEntityRepositoryBase<int, Issue> _repository = repository;
-    private readonly ILogger<UpdateHandler> _logger = logger;
-
     public async Task<IssueResponseDto> Handle(UpdateIssueCommand request, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Start updating {Issue} with {Id} in UpdateHandler.",
-            typeof(Issue).Name, request.Id);
-        Issue issue = request.ToModel();
-        Issue result = await _repository.Update(issue, SqlStatements.ForIssues.Update);
-        _logger.LogInformation("Successfully completed updating {Issue} with {Id} in EntityRepository.",
-            typeof(Issue).Name, request.Id);
+        logger.LogInformation("Start updating {Issue} with {Id} in {UpdateHandler}.",
+            typeof(Issue).Name, request.Id, typeof(UpdateHandler));
+        Issue issue = await repository.GetById(request.Id);
+        request.SetToModel(issue);
+        Issue result = await repository.Update(issue);
+        logger.LogInformation("Successfully completed updating {Issue} with {Id} in {IssueRepository}.",
+            typeof(Issue).Name, request.Id, typeof(IIssueRepository));
 
         return result.ToDto();
     }

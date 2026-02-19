@@ -4,11 +4,11 @@ using Board.DataAccess.Models;
 namespace Board.BusinessLogic.DTOs.Columns;
 
 public record ColumnResponseDto(
-    int Id,
+    long Id,
     string Name,
     string Description,
     int Position,
-    int UserId);
+    string UserId);
 
 public static class ColumnResponseDtoExtensions
 {

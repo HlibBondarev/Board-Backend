@@ -4,7 +4,7 @@ using Board.DataAccess.Models;
 namespace Board.BusinessLogic.DTOs.Users;
 
 public record UserResponseDto(
-    int Id,
+    string Id,
     string Email,
     string DisplayName,
     DateTime CreatedAt);

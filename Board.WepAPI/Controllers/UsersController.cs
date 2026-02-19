@@ -2,17 +2,20 @@
 using Board.BusinessLogic.Features.ForUser.Commands;
 using Board.BusinessLogic.Features.ForUser.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Board.WepAPI.Controllers;
 
+[Authorize]
 [Route("api/[controller]")]
 [ApiController]
-public class UserController(IMediator mediator, ILogger<UserController> logger) : ControllerBase
+public class UsersController(IMediator mediator, ILogger<UsersController> logger) : ControllerBase
 {
     private readonly IMediator _mediator = mediator;
-    private readonly ILogger<UserController> _logger = logger;
+    private readonly ILogger<UsersController> _logger = logger;
 
+    [AllowAnonymous]
     [HttpGet]
     public async Task<IEnumerable<UserResponseDto>> GetAllUsers()
     {
@@ -21,8 +24,9 @@ public class UserController(IMediator mediator, ILogger<UserController> logger) 
         return users ?? [];
     }
 
+    [AllowAnonymous]
     [HttpGet("{userId}")]
-    public async Task<ActionResult<UserResponseDto>> GetUser(int userId)
+    public async Task<ActionResult<UserResponseDto>> GetUser(string userId)
     {
         var user = await _mediator.Send(new GetUserByIdQuery(userId));
         if (user == null)
@@ -44,8 +48,9 @@ public class UserController(IMediator mediator, ILogger<UserController> logger) 
         }, createdUser);
     }
 
+    [Authorize(Policy = "MustBeThisUser")]
     [HttpPut("{userId}")]
-    public async Task<ActionResult<UserResponseDto>> Update(int userId, UpdateUserCommand command)
+    public async Task<ActionResult<UserResponseDto>> Update(string userId, UpdateUserCommand command)
     {
         var user = await _mediator.Send(new GetUserByIdQuery(userId));
         if (user == null)
@@ -57,8 +62,9 @@ public class UserController(IMediator mediator, ILogger<UserController> logger) 
         return savedUser;
     }
 
+    [Authorize(Policy = "MustBeThisUser")]
     [HttpDelete("{userId}")]
-    public async Task<IActionResult> Delete(int userId)
+    public async Task<IActionResult> Delete(string userId)
     {
         var user = await _mediator.Send(new GetUserByIdQuery(userId));
         if (user == null)

@@ -3,10 +3,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Board.DataAccess.Models;
 
-public class User : IKeyedEntity<int>
+public class User : IKeyedEntity<string>
 {
     [Required]
-    public int Id { get; init; }
+    public string Id { get; init; } = null!;
 
     [Required]
     [EmailAddress]

@@ -4,15 +4,15 @@ using Board.DataAccess.Models;
 namespace Board.BusinessLogic.DTOs.Issues;
 
 public record IssueResponseDto(
-    int Id,
+    long Id,
     string Title,
     string Description,
     DateTime? DueDate,
     DateTime CreatedAt,
-    int PositionInColumn,
-    int ColumnId,
-    int CreatorId,
-    int? AssigneeId);
+    long PositionInColumn,
+    long ColumnId,
+    string CreatorId,
+    string? AssigneeId);
 
 public static class IssueResponseDtoExtensions
 {

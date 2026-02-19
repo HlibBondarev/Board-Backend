@@ -1,7 +1,12 @@
-﻿using Board.BusinessLogic.Features;
-using Board.DataAccess.Repository.Base;
+﻿using Board.BusinessLogic.Services;
+using Board.BusinessLogic.Services.Api;
+using Board.DataAccess.Repository;
+using Board.DataAccess.Repository.Api;
+using Board.WepAPI.Authorization;
 using Board.WepAPI.Middleware;
 using DbUp;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Scalar.AspNetCore;
 using Serilog;
 using Serilog.Exceptions;
@@ -30,7 +35,7 @@ public static class Startup
 
         var upgrader = DeployChanges.To
             .SqlDatabase(connectionString, null)
-            .WithScriptsEmbeddedInAssembly(typeof(EntityRepositoryBase<,>).Assembly)
+            .WithScriptsEmbeddedInAssembly(typeof(IUserRepository).Assembly)
             .WithTransaction()
             .LogToConsole()
             .Build();
@@ -43,12 +48,48 @@ public static class Startup
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         services.AddOpenApi();
 
-        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(SqlStatements).Assembly));
+        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(ICurrentUser).Assembly));
 
         services.AddControllers();
 
+        services.AddCors(options => options.AddPolicy("AllowReactApp", builder =>
+            builder.AllowAnyMethod()
+                   .AllowAnyHeader()
+                   .WithOrigins("http://localhost:5173")
+                   .AllowCredentials()));
+
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme =
+            JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme =
+            JwtBearerDefaults.AuthenticationScheme;
+        }).AddJwtBearer(options =>
+        {
+            options.Authority = configuration["Auth0:Authority"];
+            options.Audience = configuration["Auth0:Audience"];
+        });
+
+        services.AddHttpClient();
+        services.AddAuthorization(options =>
+          options.AddPolicy("MustBeThisUser", policy =>
+            policy.Requirements
+              .Add(new MustBeThisUserRequirement())));
+
+        services.AddScoped<IAuthorizationHandler, MustBeThisUserHandler>();
+        services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+        services.AddHttpClient<ICurrentUser, CurrentUser>(client =>
+        {
+            var authority = configuration["Auth:Authority"];
+            _ = authority ?? throw new ArgumentNullException(nameof(authority));
+            client.BaseAddress = new Uri($"{authority.TrimEnd('/')}/");
+        });
+
         //services.AddScoped(typeof(IEntityRepositoryBase<,>), typeof(EntityRepositoryBase<,>));
-        services.AddTransient(typeof(IEntityRepositoryBase<,>), typeof(EntityRepositoryBase<,>));
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IColumnRepository, ColumnRepository>();
+        services.AddScoped<IIssueRepository, IssueRepository>();
     }
 
     public static void Configure(this WebApplication app)
@@ -71,9 +112,13 @@ public static class Startup
             app.UseHttpsRedirection();
         }
 
+        app.UseRouting();
+
+        app.UseCors("AllowReactApp");
+
         app.UseAuthentication();
 
-        //app.UseAuthorization();
+        app.UseAuthorization();
 
         app.MapControllers();
 

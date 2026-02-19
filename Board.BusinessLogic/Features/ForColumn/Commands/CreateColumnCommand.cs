@@ -19,7 +19,7 @@ public record CreateColumnCommand(
     int Position,
 
     [Required]
-    int UserId
+    string UserId
 ) : IRequest<ColumnResponseDto>;
 
 public static class CreateColumnCommandExtensions

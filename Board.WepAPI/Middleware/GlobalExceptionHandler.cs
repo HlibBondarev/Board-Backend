@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Authentication;
 
 namespace Board.WepAPI.Middleware;
 
@@ -29,6 +30,9 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
 
             ArgumentException ex => (StatusCodes.Status400BadRequest,
                 string.IsNullOrWhiteSpace(ex.Message) ? "Validation error. Please check your input data and try again." : ex.Message),
+
+            AuthenticationException ex => (StatusCodes.Status400BadRequest,
+                string.IsNullOrWhiteSpace(ex.Message) ? $"Can not get user's claim from Context." : ex.Message),
 
             KeyNotFoundException ex => (StatusCodes.Status404NotFound,
                 string.IsNullOrWhiteSpace(ex.Message) ? "No entity with this Id was found." : ex.Message),

@@ -8,7 +8,7 @@ namespace Board.BusinessLogic.Features.ForColumn.Commands;
 
 public record UpdateColumnCommand(
     [Required]
-    int Id,
+    long Id,
 
     [Required]
     [StringLength(50, MinimumLength = 3)]
@@ -22,7 +22,7 @@ public record UpdateColumnCommand(
     int Position,
 
     [Required]
-    int UserId
+    string UserId
     ) : IRequest<ColumnResponseDto>;
 
 public static class UpdateColumnCommandExtensions

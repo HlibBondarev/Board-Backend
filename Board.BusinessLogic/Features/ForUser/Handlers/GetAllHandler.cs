@@ -2,24 +2,24 @@
 using Board.BusinessLogic.Features.ForUser.Queries;
 using Board.Common.Exceptions;
 using Board.DataAccess.Models;
-using Board.DataAccess.Repository.Base;
+using Board.DataAccess.Repository.Api;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Board.BusinessLogic.Features.ForUser.Handlers;
 
-public class GetAllHandler(IEntityRepositoryBase<int, User> repository,
+public class GetAllHandler(
+    IUserRepository repository,
     ILogger<GetAllHandler> logger) : IRequestHandler<GetAllUsersQuery, IEnumerable<UserResponseDto>>
 {
-    private readonly IEntityRepositoryBase<int, User> _repository = repository;
-    private readonly ILogger<GetAllHandler> _logger = logger;
-
     public async Task<IEnumerable<UserResponseDto>> Handle(GetAllUsersQuery request, CancellationToken ct)
     {
-        _logger.LogInformation("Start executing GetAllQuery for {User}s in UpdateHandler.", typeof(User).Name);
-        var users = await _repository.GetAll(SqlStatements.ForUsers.GetAll);
+        logger.LogInformation("Start executing GetAllQuery for {User}s in {GetAllHandler}.",
+            typeof(User).Name, typeof(GetAllHandler));
+        var users = await repository.GetAll();
+        logger.LogInformation("Successfully completed executing GetAllQuery for {User}s in {UserRepository}S.",
+            typeof(User).Name, typeof(IUserRepository));
         _ = users ?? throw new NotFoundException($"No users found");
-        _logger.LogInformation("Successfully completed executing GetAllQuery for {User}s in EntityRepository.", typeof(User).Name);
 
         return users.ToDto();
     }

@@ -22,12 +22,12 @@ public record CreateIssueCommand(
     int PositionInColumn,
 
     [Required]
-    int ColumnId,
+    long ColumnId,
 
     [Required]
-    int CreatorId,
+    string CreatorId,
 
-    int? AssigneeId
+    string? AssigneeId
 ) : IRequest<IssueResponseDto>;
 
 public static class CreateColumnCommandExtensions

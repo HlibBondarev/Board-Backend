@@ -3,6 +3,7 @@ using Board.DataAccess.Models.Base;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using System.Data;
 using static Dapper.SqlMapper;
 
 namespace Board.DataAccess.Repository.Base;
@@ -11,7 +12,7 @@ public abstract class EntityRepositoryBase<TKey, TEntity>(IConfiguration configu
     where TEntity : class, IKeyedEntity<TKey>, new()
     where TKey : IEquatable<TKey>
 {
-    private readonly string _connectionString = configuration["ConnectionStrings:DefaultConnection"]
+    protected readonly string _connectionString = configuration["ConnectionStrings:DefaultConnection"]
         ?? throw new InvalidOperationException("DefaultConnection connection string is missing.");
 
     protected internal async Task<TEntity> CreateOrUpdate(TEntity entity, string sql)
@@ -130,6 +131,28 @@ public abstract class EntityRepositoryBase<TKey, TEntity>(IConfiguration configu
         );
 
         return entities;
+    }
+
+    protected internal async Task<string?> ExecuteReaderAsync(
+    string sql,
+    Dictionary<string, object> parameters)
+    {
+        // Use a local connection to ensure it stays open during the entire operation
+        using var connection = new SqlConnection(_connectionString);
+        await connection.OpenAsync();
+
+        // SQL Server returns FOR JSON results as a sequence of string fragments.
+        // QueryAsync<string> will fetch all these fragments into a list.
+        var fragments = await connection.QueryAsync<string>(
+            sql,
+            parameters,
+            commandType: CommandType.StoredProcedure
+        );
+
+        // Concatenate all fragments into a single JSON string
+        var finalJson = string.Concat(fragments);
+
+        return string.IsNullOrWhiteSpace(finalJson) ? null : finalJson;
     }
 
     protected internal async Task ExecuteCommandAsync(

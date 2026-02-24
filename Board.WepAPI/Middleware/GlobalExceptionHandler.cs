@@ -19,7 +19,7 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
         logger.LogError(exception, "Exception occurred: {Message}", exception.Message);
 
         // Determine the status code based on exception type
-        var (statusCode, message) = exception switch
+        var (statusCode, _) = exception switch
         {
             // Custom application exceptions (400, 403, 404)
             BaseException customEx => (customEx.StatusCode, customEx.Message),
@@ -28,11 +28,20 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
             ArgumentNullException => (StatusCodes.Status400BadRequest,
                 "Request data is empty. Please check your input data and try again."),
 
+            InvalidOperationException => (StatusCodes.Status400BadRequest,
+                string.IsNullOrWhiteSpace(exception.Message)
+                ? "Invalid operation. Please check your input data and try again."
+                : exception.Message),
+
             ArgumentException ex => (StatusCodes.Status400BadRequest,
-                string.IsNullOrWhiteSpace(ex.Message) ? "Validation error. Please check your input data and try again." : ex.Message),
+                string.IsNullOrWhiteSpace(ex.Message)
+                ? "Validation error. Please check your input data and try again."
+                : ex.Message),
 
             AuthenticationException ex => (StatusCodes.Status400BadRequest,
-                string.IsNullOrWhiteSpace(ex.Message) ? $"Can not get user's claim from Context." : ex.Message),
+                string.IsNullOrWhiteSpace(ex.Message)
+                ? $"Can not get user's claim from Context."
+                : ex.Message),
 
             KeyNotFoundException ex => (StatusCodes.Status404NotFound,
                 string.IsNullOrWhiteSpace(ex.Message) ? "No entity with this Id was found." : ex.Message),

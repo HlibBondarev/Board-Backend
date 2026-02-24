@@ -6,6 +6,7 @@ namespace Board.DataAccess.Models;
 public class User : IKeyedEntity<string>
 {
     [Required]
+    [MaxLength(64)]
     public string Id { get; init; } = null!;
 
     [Required]

@@ -3,7 +3,7 @@ CREATE TABLE Users (
     Id VARCHAR(64) NOT NULL PRIMARY KEY,
     Email NVARCHAR(255) NOT NULL UNIQUE, 
     DisplayName NVARCHAR(20) NOT NULL CHECK (LEN(DisplayName) >= 3),
-    CreatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME()
+    CreatedAt DATETIME2 NOT NULL
 );
 GO
 
@@ -12,7 +12,7 @@ CREATE TABLE Boards (
     Id BIGINT IDENTITY(1,1) PRIMARY KEY,
     Title NVARCHAR(100) NOT NULL CHECK (LEN(Title) >= 3),
     Description NVARCHAR(500) NULL,
-    CreatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME()
+    CreatedAt DATETIME2 NOT NULL
 );
 GO
 
@@ -42,7 +42,7 @@ CREATE TABLE Issues (
     Title NVARCHAR(200) NOT NULL CHECK (LEN(Title) >= 3),
     Description NVARCHAR(2000) NOT NULL CHECK (LEN(Description) >= 10),
     DueDate DATETIME2 NULL,
-    CreatedAt DATETIME2 NOT NULL DEFAULT SYSDATETIME(),
+    CreatedAt DATETIME2 NOT NULL,
     PositionInColumn BIGINT NOT NULL,
     ColumnId BIGINT NOT NULL FOREIGN KEY REFERENCES Columns(Id) ON DELETE CASCADE,
     CreatorId VARCHAR(64) NOT NULL FOREIGN KEY REFERENCES Users(Id),
@@ -62,9 +62,9 @@ INSERT INTO Users (Id, Email, DisplayName, CreatedAt) VALUES
 GO
 
 -- Insert Boards (Projects)
-INSERT INTO Boards (Title, Description) VALUES 
-('Main Development Board', 'Core application development workspace'),
-('Marketing Campaign', 'Planning for the new product launch');
+INSERT INTO Boards (Title, Description, CreatedAt) VALUES 
+('Main Development Board', 'Core application development workspace', SYSDATETIME()),
+('Marketing Campaign', 'Planning for the new product launch', SYSDATETIME());
 GO
 
 -- Assign Roles (Taras is Admin of Board 1, Ivan is a Member)

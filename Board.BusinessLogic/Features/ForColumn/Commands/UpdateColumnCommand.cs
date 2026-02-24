@@ -22,7 +22,7 @@ public record UpdateColumnCommand(
     int Position,
 
     [Required]
-    string UserId
+    long BoardId
     ) : IRequest<ColumnResponseDto>;
 
 public static class UpdateColumnCommandExtensions
@@ -33,7 +33,7 @@ public static class UpdateColumnCommandExtensions
         Name = dto.Name,
         Description = dto.Description,
         Position = dto.Position,
-        UserId = dto.UserId
+        BoardId = dto.BoardId
     };
 
     public static List<Column> ToModel(this IEnumerable<UpdateColumnCommand> list)

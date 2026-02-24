@@ -29,4 +29,8 @@
     <None Include="Features\ForUser\Commands\CreateUserCommand.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Features\ForBoards\Commands\" />
+  </ItemGroup>
+
 </Project>

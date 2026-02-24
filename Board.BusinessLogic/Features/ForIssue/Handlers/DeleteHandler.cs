@@ -1,5 +1,4 @@
-﻿using Board.BusinessLogic.DTOs.Columns;
-using Board.BusinessLogic.DTOs.Issues;
+﻿using Board.BusinessLogic.DTOs.Issues;
 using Board.BusinessLogic.Features.ForIssue.Commands;
 using Board.Common.Exceptions;
 using Board.DataAccess.Models;
@@ -48,63 +47,65 @@ public class DeleteHandler(
 
         // Fetch updated data for the column to return the current state after deletion
         (IEnumerable<Column> columns, IEnumerable<Issue>? issues, IEnumerable<User> users)
-            = await columnRepository.GetAllWithIssuesAndUsers();
+            = await columnRepository.GetAllIssuesInBoard();
 
         // Ensure the requested column exists in the retrieved data
         var requestedColumnArr = new[] { columns.First(i => i.Id == columnId) };
 
         // Map to DTOs and extract issues for the specific column
-        var issuesInColumn = MapToColumnResponseDto(requestedColumnArr, issues, users) ?? [];
+        //var issuesInColumn = MapToColumnResponseDto(requestedColumnArr, issues, users) ?? [];
 
         // Return the response with the updated list of issues for the column
-        return new IssuesByColumnIdResponseDto(columnId, issuesInColumn.First(i => i.Id == columnId).Issues);
+        //return new IssuesByColumnIdResponseDto(columnId, issuesInColumn.First(i => i.Id == columnId).Issues);
+
+        return null;
     }
 
-    private static IEnumerable<ColumnWithIssuesAndUserResponseDto> MapToColumnResponseDto(
-    IEnumerable<Column> columns,
-    IEnumerable<Issue> issues,
-    IEnumerable<User> users)
-    {
-        // Guard clauses
-        columns ??= [];
-        issues ??= [];
-        users ??= [];
+    //private static IEnumerable<ColumnWithIssuesAndUserResponseDto> MapToColumnResponseDto(
+    //IEnumerable<Column> columns,
+    //IEnumerable<Issue> issues,
+    //IEnumerable<User> users)
+    //{
+    //    // Guard clauses
+    //    columns ??= [];
+    //    issues ??= [];
+    //    users ??= [];
 
-        // 1. Create a fast O(N) lookup for issues (grouped by ColumnId)
-        var issuesLookup = issues.ToLookup(i => i.ColumnId);
+    //    // 1. Create a fast O(N) lookup for issues (grouped by ColumnId)
+    //    var issuesLookup = issues.ToLookup(i => i.ColumnId);
 
-        // 2. Create a Dictionary for O(1) user display name lookups
-        var usersDict = users.ToDictionary(u => u.Id, u => u.DisplayName);
+    //    // 2. Create a Dictionary for O(1) user display name lookups
+    //    var usersDict = users.ToDictionary(u => u.Id, u => u.DisplayName);
 
-        // Helper to resolve DisplayName safely
-        string GetDisplayName(string id) =>
-            usersDict.TryGetValue(id, out var name) ? name : "Unknown User";
+    //    // Helper to resolve DisplayName safely
+    //    string GetDisplayName(string id) =>
+    //        usersDict.TryGetValue(id, out var name) ? name : "Unknown User";
 
-        // 3. Project entities into the final DTO structure
-        return [.. columns
-            .OrderBy(c => c.Position)
-            .Select(c => new ColumnWithIssuesAndUserResponseDto(
-                c.Id,
-                c.Name,
-                c.Description,
-                c.Position,
-                c.UserId,
-                GetDisplayName(c.UserId),
-                [.. issuesLookup[c.Id]
-                    .OrderBy(i => i.PositionInColumn)
-                    .Select(i => new IssueWithUserByColumnsResponseDto(
-                        i.Id,
-                        i.Title,
-                        i.Description,
-                        i.DueDate,
-                        i.CreatedAt,
-                        i.PositionInColumn,
-                        i.ColumnId,
-                        i.CreatorId,
-                        GetDisplayName(i.CreatorId),
-                        i.AssigneeId,
-                        i.AssigneeId != null ? GetDisplayName(i.AssigneeId) : null
-                    ))]
-            ))];
-    }
+    //    // 3. Project entities into the final DTO structure
+    //    return [.. columns
+    //        .OrderBy(c => c.Position)
+    //        .Select(c => new ColumnWithIssuesAndUserResponseDto(
+    //            c.Id,
+    //            c.Name,
+    //            c.Description,
+    //            c.Position,
+    //            c.UserId,
+    //            GetDisplayName(c.UserId),
+    //            [.. issuesLookup[c.Id]
+    //                .OrderBy(i => i.PositionInColumn)
+    //                .Select(i => new IssueWithUserByColumnsResponseDto(
+    //                    i.Id,
+    //                    i.Title,
+    //                    i.Description,
+    //                    i.DueDate,
+    //                    i.CreatedAt,
+    //                    i.PositionInColumn,
+    //                    i.ColumnId,
+    //                    i.CreatorId,
+    //                    GetDisplayName(i.CreatorId),
+    //                    i.AssigneeId,
+    //                    i.AssigneeId != null ? GetDisplayName(i.AssigneeId) : null
+    //                ))]
+    //        ))];
+    //}
 }

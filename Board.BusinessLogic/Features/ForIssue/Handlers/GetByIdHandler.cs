@@ -19,7 +19,7 @@ public class GetByIdHandler(
         var issue = await repository.GetById(request.Id);
         logger.LogInformation("Successfully completed executing GetByIdQuery for {Issue} with {Id} in {IssueRepository}.",
             typeof(Issue).Name, issue.Id, typeof(IIssueRepository));
-        _ = issue ?? throw new NotFoundException($"{typeof(Column).Name} with Id = {request.Id} not found");
+        _ = issue ?? throw new NotFoundException($"{typeof(Issue).Name} with Id = {request.Id} not found");
 
         return issue.ToDto();
     }

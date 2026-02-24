@@ -19,7 +19,7 @@ public record CreateColumnCommand(
     int Position,
 
     [Required]
-    string UserId
+    long BoardId
 ) : IRequest<ColumnResponseDto>;
 
 public static class CreateColumnCommandExtensions
@@ -29,7 +29,7 @@ public static class CreateColumnCommandExtensions
         Name = dto.Name,
         Description = dto.Description,
         Position = dto.Position,
-        UserId = dto.UserId
+        BoardId = dto.BoardId
     };
 
     public static List<Column> ToModel(this IEnumerable<CreateColumnCommand> list)

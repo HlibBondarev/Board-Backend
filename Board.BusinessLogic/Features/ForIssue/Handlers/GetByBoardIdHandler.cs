@@ -47,7 +47,6 @@ public class GetByBoardIdHandler(
         }
         catch (JsonException ex)
         {
-            // Log the error (e.g., using ILogger)
             throw new InvalidOperationException("Failed to process board data structure.", ex);
         }
     }

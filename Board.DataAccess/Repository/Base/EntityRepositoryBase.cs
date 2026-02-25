@@ -112,7 +112,7 @@ public abstract class EntityRepositoryBase<TKey, TEntity>(IConfiguration configu
         await readFunc(multi);
     }
 
-    protected internal async Task<IEnumerable<TEntity>> QueryAsync(
+    protected internal async Task<TEntity> QueryFirstAsync(
         string sql,
         Dictionary<string, object> parameters)
     {
@@ -125,7 +125,7 @@ public abstract class EntityRepositoryBase<TKey, TEntity>(IConfiguration configu
         using var connection = new SqlConnection(_connectionString);
 
         await connection.OpenAsync();
-        var entities = await connection.QueryAsync<TEntity>(
+        var entities = await connection.QueryFirstAsync<TEntity>(
             sql: sql,
             param: dbArgs
         );

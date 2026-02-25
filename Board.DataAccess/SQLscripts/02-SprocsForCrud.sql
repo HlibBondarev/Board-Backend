@@ -122,6 +122,57 @@ BEGIN
 END;
 GO
 
+-- Create a new board and assign the creating user as Admin, also creates default columns 
+-- (To Do, In Progress, Done)
+CREATE PROCEDURE sp_CreateBoardWithAdmin
+    @Title NVARCHAR(100),
+    @Description NVARCHAR(500),
+    @UserId VARCHAR(64),
+    @CreatedAt DATETIME2 
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        -- 1. Insert a new record into the Boards table using the provided @CreatedAt
+        INSERT INTO Boards (Title, Description, CreatedAt)
+        VALUES (@Title, @Description, @CreatedAt);
+
+        -- 2. Get the ID of the newly created Board
+        DECLARE @NewBoardId BIGINT = SCOPE_IDENTITY();
+
+        -- 3. Assign the user as the 'Admin' of the new board
+        INSERT INTO BoardMembers (BoardId, UserId, Role)
+        VALUES (@NewBoardId, @UserId, 'Admin');
+
+        -- 4. Create default columns for the board
+        -- Position 1: To Do
+        -- Position 2: In Progress
+        -- Position 3: Done
+        INSERT INTO Columns (Name, Description, Position, BoardId)
+        VALUES 
+        (N'To Do', N'Tasks that are ready to be started', 1, @NewBoardId),
+        (N'In Progress', N'Tasks that are currently being worked on', 2, @NewBoardId),
+        (N'Done', N'Tasks that have been completed', 3, @NewBoardId);
+
+        COMMIT TRANSACTION;
+
+        -- Return the new board for further application use
+        SELECT * FROM Boards WHERE Id = @NewBoardId;
+    END TRY
+    BEGIN CATCH
+        -- Rollback the transaction if any error occurs
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+
+        -- Re-throw the error
+        THROW;
+    END CATCH
+END;
+GO
+
 -- Get board details by Id
 CREATE PROCEDURE sp_Boards_GetById
     @Id BIGINT
@@ -150,7 +201,7 @@ BEGIN
 END;
 GO
 
--- Get all boards for a specific user with his role ordered by creation date
+-- Get all boards in JSON-format for a specific user with his role ordered by creation date
 CREATE PROCEDURE sp_Boards_GetByUserIdWithRole
     @UserId VARCHAR(64)
 AS
@@ -165,7 +216,8 @@ BEGIN
     FROM Boards b
     INNER JOIN BoardMembers bm ON b.Id = bm.BoardId
     WHERE bm.UserId = @UserId
-    ORDER BY b.CreatedAt DESC;
+    ORDER BY b.CreatedAt DESC
+    FOR JSON PATH;
 END;
 GO
 
@@ -459,42 +511,6 @@ BEGIN
     FOR JSON PATH, WITHOUT_ARRAY_WRAPPER;
 END;
 GO
-
---CREATE PROCEDURE sp_Issues_GetByBoardId
---    @BoardId BIGINT
---AS
---BEGIN
---    SET NOCOUNT ON
---    SELECT 
---        b.Id AS BoardId,
---        b.Title AS BoardTitle,
---        b.Description AS BoardDescription,
---        b.CreatedAt AS BoardCreatedAt,
---        c.Id AS ColumnId,
---        c.Name AS ColumnName,
---        c.Description AS ColumnDescription,
---        c.Position AS ColumnPosition,
---        i.Id AS IssueId,
---        i.Title AS IssueTitle,
---        i.Description AS IssueDescription,
---        i.DueDate AS IssueDueDate,
---        i.CreatedAt AS IssueCreatedAt,
---        i.PositionInColumn AS IssuePositionInColumn,
---        i.CreatorId AS IssueCreatorId,
---        i.AssigneeId AS IssueAssigneeId,
---        u2.DisplayName AS CreatorName,
---        u3.DisplayName AS AssigneeName
---    FROM Boards b
---    INNER JOIN BoardMembers bm ON b.Id = bm.BoardId
---    INNER JOIN Users u ON bm.UserId = u.Id
---    LEFT JOIN Columns c ON b.Id = c.BoardId
---    LEFT JOIN Issues i ON c.Id = i.ColumnId
---    INNER JOIN Users u2 ON i.CreatorId = u2.Id
---    LEFT JOIN Users u3 ON i.AssigneeId = u3.Id
---    WHERE b.Id = @BoardId
---    ORDER BY c.Position, i.PositionInColumn;
---END;
---GO
 
 -- GetAll
 CREATE PROCEDURE sp_Issues_GetAll

@@ -1,5 +1,6 @@
 ﻿using Board.BusinessLogic.DTOs.Boards;
 using Board.BusinessLogic.DTOs.Columns;
+using Board.BusinessLogic.Features.ForBoards.Commands;
 using Board.BusinessLogic.Features.ForBoards.Queries;
 using Board.BusinessLogic.Features.ForColumn.Commands;
 using Board.BusinessLogic.Features.ForColumn.Queries;
@@ -38,7 +39,13 @@ public class BoardsController(
         return board;
     }
 
+    [HttpPost]
+    public async Task<ActionResult<BoardCreateResponseDto>> Create(CreateBoardCommand command)
+    {
+        var result = await mediator.Send(command);
 
+        return Ok(result);
+    }
 
     //[AllowAnonymous]
     //[HttpGet("{columnId}")]
@@ -51,17 +58,6 @@ public class BoardsController(
     //    }
 
     //    return column;
-    //}
-
-    //[HttpPost]
-    //public async Task<ActionResult<ColumnResponseDto>> Create(CreateColumnCommand command)
-    //{
-    //    var createdColumn = await mediator.Send(command);
-
-    //    return CreatedAtAction(nameof(GetColumn), new
-    //    {
-    //        userId = createdColumn.Id
-    //    }, createdColumn);
     //}
 
     [HttpPut("{columnId}")]

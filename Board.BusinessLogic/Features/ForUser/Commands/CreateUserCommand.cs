@@ -9,7 +9,7 @@ namespace Board.BusinessLogic.Features.ForUser.Commands;
 
 public record CreateUserCommand(
     [Required]
-    [StringLength(64)]
+    [MaxLength(64)]
     [property: JsonPropertyName("sub")]
     string Id,
 

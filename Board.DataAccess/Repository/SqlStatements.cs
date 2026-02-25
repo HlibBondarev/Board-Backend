@@ -25,13 +25,21 @@ public static class SqlStatements
     public static class ForBoards
     {
         public const string Create =
-            @"EXEC sp_Boards_Create @Id = @Id, @Title = @Title, @Description = @Description, @CreatedAt = @CreatedAt";
+            @"EXEC sp_Boards_Create 
+            @Id = @Id, @Title = @Title, 
+            @Description = @Description, 
+            @CreatedAt = @CreatedAt";
+        public const string CreateWithAdmin =
+            @"sp_CreateBoardWithAdmin";
+        //@"EXEC sp_CreateBoardWithAdmin
+        //@Title = @Title, @Description = @Description, 
+        //@CreatedAt = @CreatedAt, @UserId = @UserId";
         public const string GetById =
             @"EXEC sp_Boards_GetById @Id = @Id";
         public const string GetBoardsByUserId =
             @"EXEC sp_Boards_GetByUserId @UserId = @UserId";
         public const string GetBoardsByUserIdWithRole =
-            @"EXEC sp_Boards_GetByUserIdWithRole @UserId = @UserId";
+            @"sp_Boards_GetByUserIdWithRole";
         public const string GetAll =
             @"EXEC sp_Boards_GetAll";
         public const string Any =
@@ -78,10 +86,8 @@ public static class SqlStatements
             @"EXEC sp_Issues_GetById @Id = @Id";
         public const string GetByColumnId =
             @"EXEC sp_Issues_GetByColumnId @ColumnId = @ColumnId";
-
         public const string GetByBoardId =
             @"sp_Issues_GetByBoardId";
-
         public const string GetAll =
             @"EXEC sp_Issues_GetAll";
         public const string Any =

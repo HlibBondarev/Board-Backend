@@ -38,13 +38,30 @@ public class BoardRepository(IConfiguration configuration) : EntityRepositoryBas
         return string.IsNullOrWhiteSpace(jsonResult) ? null : jsonResult;
     }
 
-    public async Task<IEnumerable<Models.Board>> GetByUserId(string userId)
+    public async Task<string?> GetByUserId(string userId)
     {
         var parameters = new Dictionary<string, object>
         {
             { "UserId", userId }
         };
 
-        return await QueryAsync(SqlStatements.ForBoards.GetBoardsByUserId, parameters);
+        var jsonResult = await ExecuteReaderAsync(
+           SqlStatements.ForBoards.GetBoardsByUserIdWithRole, parameters);
+
+        // Return null if the result is empty, otherwise return the full JSON string
+        return string.IsNullOrWhiteSpace(jsonResult) ? null : jsonResult;
+    }
+
+    public async Task<Models.Board> CreateWithAdmin(Models.Board board, string userId)
+    {
+        var parameters = new Dictionary<string, object>
+        {
+            { "Title", board.Title },
+            { "Description", board.Description ?? string.Empty },
+            { "CreatedAt", board.CreatedAt },
+            { "UserId", userId }
+        };
+
+        return await QueryFirstAsync(SqlStatements.ForBoards.CreateWithAdmin, parameters);
     }
 }

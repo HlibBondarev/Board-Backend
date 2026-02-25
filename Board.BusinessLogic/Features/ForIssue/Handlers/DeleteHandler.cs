@@ -5,6 +5,8 @@ using Board.DataAccess.Models;
 using Board.DataAccess.Repository.Api;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Board.BusinessLogic.Features.ForIssue.Handlers;
 
@@ -41,71 +43,49 @@ public class DeleteHandler(
         }
 
         // Reorder remaining issues in the column after deletion
-        await issueRepository.ReorderIssuesInColumnAsync(
+        bool isReordered = await issueRepository.ReorderIssuesInColumnAsync(
             issueToDelete.PositionInColumn,
             columnId);
 
-        // Fetch updated data for the column to return the current state after deletion
-        (IEnumerable<Column> columns, IEnumerable<Issue>? issues, IEnumerable<User> users)
-            = await columnRepository.GetAllIssuesInBoard();
+        if (!isReordered)
+        {
+            logger.LogWarning(
+                "Failed to reorder {Issue}s in {Column} after deleting {Issue} with {Id} in {DeleteHandler}.",
+                typeof(Issue).Name, typeof(Column).Name, typeof(Issue).Name, request.Id, typeof(DeleteHandler).Name);
+        }
 
-        // Ensure the requested column exists in the retrieved data
-        var requestedColumnArr = new[] { columns.First(i => i.Id == columnId) };
+        // 1. Fetch raw JSON string from the repository
+        string? rawJson = await columnRepository.GetIssuesInColumnRaw(columnId);
 
-        // Map to DTOs and extract issues for the specific column
-        //var issuesInColumn = MapToColumnResponseDto(requestedColumnArr, issues, users) ?? [];
+        _ = rawJson ?? throw new NotFoundException($"{typeof(Column)} with Id = {columnId} not found");
 
-        // Return the response with the updated list of issues for the column
-        //return new IssuesByColumnIdResponseDto(columnId, issuesInColumn.First(i => i.Id == columnId).Issues);
+        logger.LogInformation(
+            "Successfully completed executing GetIssuesInColumnRaw  query for {Column} with {Id} in {ColumnRepository}.",
+            typeof(Column).Name, request.Id, typeof(IColumnRepository));
 
-        return null;
+        try
+        {
+            // 2. Deserialize directly into the Business Layer DTO
+            // This maintains clean architecture: Repository returns raw data, Service shapes it
+            var issuesInColumn = JsonSerializer.Deserialize<IEnumerable<IssueWithUserByColumnsResponseDto>>(rawJson, jsonOptions);
+
+            // 3. Ensure collections are not null for the UI convenience
+            _ = issuesInColumn ?? throw new InvalidOperationException(
+                $"Deserialization resulted in null for {typeof(IEnumerable<IssueWithUserByColumnsResponseDto>).Name} with Id = {request.Id}.");
+
+            return new IssuesByColumnIdResponseDto(columnId, issuesInColumn);
+        }
+        catch (JsonException ex)
+        {
+            throw new InvalidOperationException(
+                $"Failed to process {typeof(IEnumerable<IssueWithUserByColumnsResponseDto>).Name} data structure.", ex);
+        }
     }
 
-    //private static IEnumerable<ColumnWithIssuesAndUserResponseDto> MapToColumnResponseDto(
-    //IEnumerable<Column> columns,
-    //IEnumerable<Issue> issues,
-    //IEnumerable<User> users)
-    //{
-    //    // Guard clauses
-    //    columns ??= [];
-    //    issues ??= [];
-    //    users ??= [];
-
-    //    // 1. Create a fast O(N) lookup for issues (grouped by ColumnId)
-    //    var issuesLookup = issues.ToLookup(i => i.ColumnId);
-
-    //    // 2. Create a Dictionary for O(1) user display name lookups
-    //    var usersDict = users.ToDictionary(u => u.Id, u => u.DisplayName);
-
-    //    // Helper to resolve DisplayName safely
-    //    string GetDisplayName(string id) =>
-    //        usersDict.TryGetValue(id, out var name) ? name : "Unknown User";
-
-    //    // 3. Project entities into the final DTO structure
-    //    return [.. columns
-    //        .OrderBy(c => c.Position)
-    //        .Select(c => new ColumnWithIssuesAndUserResponseDto(
-    //            c.Id,
-    //            c.Name,
-    //            c.Description,
-    //            c.Position,
-    //            c.UserId,
-    //            GetDisplayName(c.UserId),
-    //            [.. issuesLookup[c.Id]
-    //                .OrderBy(i => i.PositionInColumn)
-    //                .Select(i => new IssueWithUserByColumnsResponseDto(
-    //                    i.Id,
-    //                    i.Title,
-    //                    i.Description,
-    //                    i.DueDate,
-    //                    i.CreatedAt,
-    //                    i.PositionInColumn,
-    //                    i.ColumnId,
-    //                    i.CreatorId,
-    //                    GetDisplayName(i.CreatorId),
-    //                    i.AssigneeId,
-    //                    i.AssigneeId != null ? GetDisplayName(i.AssigneeId) : null
-    //                ))]
-    //        ))];
-    //}
+    private static readonly JsonSerializerOptions jsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        NumberHandling = JsonNumberHandling.AllowReadingFromString
+    };
 }

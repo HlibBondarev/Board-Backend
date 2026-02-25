@@ -78,6 +78,7 @@ BEGIN
 END
 GO
 
+-- Reorder issues in Column with id = ColumnId
 CREATE PROCEDURE sp_Issues_ReorderInColumn
     @IssuePosition INT,
     @ColumnId BIGINT
@@ -101,5 +102,35 @@ BEGIN
         IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
         THROW;
     END CATCH
+END
+GO
+
+-- Get all issues in Column with id = ColumnId
+CREATE PROCEDURE sp_Issues_GetByColumnIdWithUsersJson
+    @ColumnId BIGINT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Використовуємо SELECT для вибору полів, що відповідають вашому DTO
+    -- FOR JSON PATH автоматично серіалізує результат у JSON рядок
+    SELECT 
+        i.Id,
+        i.Title,
+        i.Description,
+        i.DueDate,
+        i.CreatedAt,
+        i.PositionInColumn,
+        i.ColumnId,
+        i.CreatorId,
+        u_creator.DisplayName AS CreatorName,
+        i.AssigneeId,
+        u_assignee.DisplayName AS AssigneeName
+    FROM Issues i
+    INNER JOIN Users u_creator ON i.CreatorId = u_creator.Id
+    LEFT JOIN Users u_assignee ON i.AssigneeId = u_assignee.Id
+    WHERE i.ColumnId = @ColumnId
+    ORDER BY i.PositionInColumn
+    FOR JSON PATH;
 END
 GO

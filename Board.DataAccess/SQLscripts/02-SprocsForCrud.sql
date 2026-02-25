@@ -202,7 +202,7 @@ END;
 GO
 
 -- Get all boards in JSON-format for a specific user with his role ordered by creation date
-CREATE PROCEDURE sp_Boards_GetByUserIdWithRole
+CREATE PROCEDURE sp_Boards_GetByUserIdWithRoleJson
     @UserId VARCHAR(64)
 AS
 BEGIN
@@ -454,7 +454,7 @@ END;
 GO
 
 -- Get all issues for a specific board
-CREATE PROCEDURE sp_Issues_GetByBoardId
+CREATE PROCEDURE sp_Issues_GetByBoardIdJson
     @BoardId BIGINT
 AS
 BEGIN

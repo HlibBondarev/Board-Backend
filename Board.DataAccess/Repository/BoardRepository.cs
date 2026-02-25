@@ -24,7 +24,7 @@ public class BoardRepository(IConfiguration configuration) : EntityRepositoryBas
     public async Task<bool> Delete(long id) =>
        await Delete(id, SqlStatements.ForBoards.Delete);
 
-    public async Task<string?> GetBoardHierarchyRawAsync(long boardId)
+    public async Task<string?> GetBoardHierarchyRaw(long boardId)
     {
         var parameters = new Dictionary<string, object>
         {

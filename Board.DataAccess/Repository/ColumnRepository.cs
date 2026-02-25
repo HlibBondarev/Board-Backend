@@ -25,21 +25,17 @@ public class ColumnRepository(IConfiguration configuration) : EntityRepositoryBa
     public async Task<bool> Delete(long id) =>
        await Delete(id, SqlStatements.ForColumns.Delete);
 
-    public async Task<(IEnumerable<Column> columns, IEnumerable<Issue> issues, IEnumerable<User> users)> GetAllIssuesInBoard()
+    public async Task<string?> GetIssuesInColumnRaw(long columnId)
     {
-        IEnumerable<Column> columns = [];
-        IEnumerable<Issue> issues = [];
-        IEnumerable<User> users = [];
-
-        // 1. Fetch all raw data sets in ONE round-trip to the database
-        await QueryMultipleAsync(SqlStatements.ForColumns.GetIssuesWithUserByColumns, null, async multi =>
+        var parameters = new Dictionary<string, object>
         {
-            //2. ReadAsync ensures the web server threads are not blocked during I/O
-            columns = await multi.ReadAsync<Column>();
-            issues = await multi.ReadAsync<Issue>();
-            users = await multi.ReadAsync<User>();
-        });
+            { "ColumnId", columnId }
+        };
 
-        return (columns, issues, users);
+        var jsonResult = await ExecuteReaderAsync(
+            SqlStatements.ForIssues.GetByColumnIdWithUsers, parameters);
+
+        // Return null if the result is empty, otherwise return the full JSON string
+        return string.IsNullOrWhiteSpace(jsonResult) ? null : jsonResult;
     }
 }

@@ -5,19 +5,27 @@ public static class SqlStatements
     public static class ForUsers
     {
         public const string Create =
-            @"EXEC sp_Users_Create @Id = @Id, @Email = @Email, @DisplayName = @DisplayName, @CreatedAt = @CreatedAt";
+            @"EXEC sp_Users_Create 
+            @Id = @Id, @Email = @Email, 
+            @DisplayName = @DisplayName, 
+            @CreatedAt = @CreatedAt";
         public const string GetById =
-            @"EXEC sp_Users_GetById @Id = @Id";
+            @"EXEC sp_Users_GetById 
+            @Id = @Id";
         public const string GetByBoardId =
-            @"EXEC sp_Users_GetByBoardId @BoardId = @BoardId";
+            @"EXEC sp_Users_GetByBoardId 
+            @BoardId = @BoardId";
         public const string GetByBoardIdWithRole =
-            @"EXEC sp_Users_GetByBoardId @BoardId = @BoardId";
+            @"EXEC sp_Users_GetByBoardId 
+            @BoardId = @BoardId";
         public const string GetAll =
             @"EXEC sp_Users_GetAll";
         public const string Any =
             @"EXEC sp_Users_Any";
         public const string Update =
-            @"EXEC sp_Users_Update @Id = @Id, @Email = @Email, @DisplayName = @DisplayName";
+            @"EXEC sp_Users_Update 
+            @Id = @Id, @Email = @Email, 
+            @DisplayName = @DisplayName";
         public const string Delete =
             @"EXEC sp_Users_Delete @Id = @Id";
     }
@@ -32,17 +40,21 @@ public static class SqlStatements
         public const string CreateWithAdmin =
             @"sp_CreateBoardWithAdmin";
         public const string GetById =
-            @"EXEC sp_Boards_GetById @Id = @Id";
+            @"EXEC sp_Boards_GetById 
+            @Id = @Id";
         public const string GetBoardsByUserId =
-            @"EXEC sp_Boards_GetByUserId @UserId = @UserId";
+            @"EXEC sp_Boards_GetByUserId 
+            @UserId = @UserId";
         public const string GetBoardsByUserIdWithRole =
-            @"sp_Boards_GetByUserIdWithRole";
+            @"sp_Boards_GetByUserIdWithRoleJson";
         public const string GetAll =
             @"EXEC sp_Boards_GetAll";
         public const string Any =
             @"EXEC sp_Boards_Any";
         public const string Update =
-            @"EXEC sp_Boards_Update @Id = @Id, @Title = @Title, @Description = @Description";
+            @"EXEC sp_Boards_Update 
+            @Id = @Id, @Title = @Title, 
+            @Description = @Description";
         public const string Delete =
             @"EXEC sp_Boards_Delete @Id = @Id";
     }
@@ -54,19 +66,22 @@ public static class SqlStatements
             @Name = @Name, @Description = @Description, 
             @BoardId = @BoardId";
         public const string GetById =
-            @"EXEC sp_Columns_GetById @Id = @Id";
+            @"EXEC sp_Columns_GetById 
+            @Id = @Id";
         public const string GetByBoardId =
-            @"EXEC sp_Columns_GetByBoardId @BoardId = @BoardId";
+            @"EXEC sp_Columns_GetByBoardId 
+            @BoardId = @BoardId";
         public const string GetAll =
             @"EXEC sp_Columns_GetAll";
         public const string Any =
             @"EXEC sp_Columns_Any";
         public const string Update =
-            @"EXEC sp_Columns_Update @Id = @Id, @Name = @Name, @Description = @Description, @Position = @Position";
+            @"EXEC sp_Columns_Update 
+            @Id = @Id, @Name = @Name, 
+            @Description = @Description, 
+            @Position = @Position";
         public const string Delete =
             @"EXEC sp_Columns_Delete @Id = @Id";
-        public const string GetIssuesWithUserByColumns =
-           @"EXEC sp_Columns_GetAll; EXEC dbo.Issue_GetAll; EXEC sp_Users_GetAll;";
     }
 
     public static class ForIssues
@@ -78,11 +93,15 @@ public static class SqlStatements
             @PositionInColumn = @PositionInColumn, @ColumnId = @ColumnId,
             @CreatorId = @CreatorId, @AssigneeId = @AssigneeId";
         public const string GetById =
-            @"EXEC sp_Issues_GetById @Id = @Id";
+            @"EXEC sp_Issues_GetById 
+            @Id = @Id";
         public const string GetByColumnId =
-            @"EXEC sp_Issues_GetByColumnId @ColumnId = @ColumnId";
+            @"EXEC sp_Issues_GetByColumnId 
+            @ColumnId = @ColumnId";
         public const string GetByBoardId =
-            @"sp_Issues_GetByBoardId";
+            @"sp_Issues_GetByBoardIdJson";
+        public const string GetByColumnIdWithUsers =
+            @"sp_Issues_GetByColumnIdWithUsersJson";
         public const string GetAll =
             @"EXEC sp_Issues_GetAll";
         public const string Any =
@@ -91,13 +110,15 @@ public static class SqlStatements
             @Id = @Id, @Title = @Title, @DueDate = @DueDate,
             @Description = @Description, @AssigneeId = @AssigneeId";
         public const string Delete =
-            @"EXEC sp_Issues_Delete @Id = @Id";
-        public const string MoveIssue = @"EXEC sp_Issues_Move
-        @IssueId = @IssueId, @TargetColumnId = @TargetColumnId,
-        @NewPosition = @NewPosition";
-        public const string ReorderIssuesInColumn = @"EXEC sp_Issues_ReorderInColumn
-        @IssuePosition = @IssuePosition, @ColumnId = @ColumnId";
-        //public const string GetIssuesByColumnId =
-        //   @"EXEC dbo.Issue_GetIssuesByColumn @ColumnId = @ColumnId";
+            @"EXEC sp_Issues_Delete 
+            @Id = @Id";
+        public const string MoveIssue =
+            @"EXEC sp_Issues_Move
+            @IssueId = @IssueId, @TargetColumnId = @TargetColumnId,
+            @NewPosition = @NewPosition";
+        public const string ReorderIssuesInColumn =
+            @"EXEC sp_Issues_ReorderInColumn
+            @IssuePosition = @IssuePosition, 
+            @ColumnId = @ColumnId";
     }
 }

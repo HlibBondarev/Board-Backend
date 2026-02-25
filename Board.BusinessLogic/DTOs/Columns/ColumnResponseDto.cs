@@ -8,7 +8,7 @@ public record ColumnResponseDto(
     string Name,
     string Description,
     int Position,
-    string UserId);
+    long BorderId);
 
 public static class ColumnResponseDtoExtensions
 {
@@ -17,7 +17,7 @@ public static class ColumnResponseDtoExtensions
         model.Name,
         model.Description,
         model.Position,
-        model.UserId);
+        model.BoardId);
 
     public static List<ColumnResponseDto> ToDto(this IEnumerable<Column> list)
         => list.MapToList(ToDto);

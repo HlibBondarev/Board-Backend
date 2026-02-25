@@ -88,6 +88,7 @@ public static class Startup
 
         //services.AddScoped(typeof(IEntityRepositoryBase<,>), typeof(EntityRepositoryBase<,>));
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IBoardRepository, BoardRepository>();
         services.AddScoped<IColumnRepository, ColumnRepository>();
         services.AddScoped<IIssueRepository, IssueRepository>();
     }

@@ -19,5 +19,5 @@ public class Column : IKeyedEntity<long>
     public int Position { get; set; }
 
     [Required]
-    public string UserId { get; set; } = null!;
+    public long BoardId { get; init; }
 }

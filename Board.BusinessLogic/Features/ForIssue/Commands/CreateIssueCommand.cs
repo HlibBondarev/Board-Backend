@@ -30,7 +30,7 @@ public record CreateIssueCommand(
     string? AssigneeId
 ) : IRequest<IssueResponseDto>;
 
-public static class CreateColumnCommandExtensions
+public static class CreateIssueCommandExtensions
 {
     public static Issue ToModel(this CreateIssueCommand dto) => new()
     {

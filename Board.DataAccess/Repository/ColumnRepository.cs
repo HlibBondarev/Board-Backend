@@ -25,7 +25,7 @@ public class ColumnRepository(IConfiguration configuration) : EntityRepositoryBa
     public async Task<bool> Delete(long id) =>
        await Delete(id, SqlStatements.ForColumns.Delete);
 
-    public async Task<(IEnumerable<Column> columns, IEnumerable<Issue> issues, IEnumerable<User> users)> GetAllWithIssuesAndUsers()
+    public async Task<(IEnumerable<Column> columns, IEnumerable<Issue> issues, IEnumerable<User> users)> GetAllIssuesInBoard()
     {
         IEnumerable<Column> columns = [];
         IEnumerable<Issue> issues = [];

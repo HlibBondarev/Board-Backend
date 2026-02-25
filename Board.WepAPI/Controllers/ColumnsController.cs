@@ -7,12 +7,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Board.WepAPI.Controllers;
 
+[Authorize]
 [Route("api/[controller]")]
 [ApiController]
 public class ColumnsController(
     IMediator mediator,
     ILogger<ColumnsController> logger) : ControllerBase
 {
+    [AllowAnonymous]
     [HttpGet]
     public async Task<IEnumerable<ColumnWithIssuesAndUserResponseDto>> GetAllColumns()
     {
@@ -23,6 +25,7 @@ public class ColumnsController(
         return columns ?? [];
     }
 
+    [AllowAnonymous]
     [HttpGet("{columnId}")]
     public async Task<ActionResult<ColumnResponseDto>> GetColumn(int columnId)
     {
@@ -35,7 +38,6 @@ public class ColumnsController(
         return column;
     }
 
-    [Authorize]
     [HttpPost]
     public async Task<ActionResult<ColumnResponseDto>> Create(CreateColumnCommand command)
     {
@@ -47,7 +49,6 @@ public class ColumnsController(
         }, createdColumn);
     }
 
-    [Authorize]
     [HttpPut("{columnId}")]
     public async Task<ActionResult<ColumnResponseDto>> Update(int columnId, UpdateColumnCommand command)
     {
@@ -61,7 +62,6 @@ public class ColumnsController(
         return savedColumn;
     }
 
-    [Authorize]
     [HttpDelete("{columnId}")]
     public async Task<IActionResult> Delete(int columnId)
     {

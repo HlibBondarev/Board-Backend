@@ -1,7 +1,7 @@
 ﻿-- Issue ---------------------------------------------------------------------------------
 -- Move an issue to a different position within the same column or to a different column, 
 -- ensuring that the order of issues is maintained correctly in both source and target columns.
-CREATE PROCEDURE dbo.Issue_Move
+CREATE PROCEDURE sp_Issues_Move
     @IssueId BIGINT,
     @TargetColumnId BIGINT,
     @NewPosition INT
@@ -78,22 +78,7 @@ BEGIN
 END
 GO
 
--- Get all issues belonging to a specific Column
-CREATE PROCEDURE dbo.Issue_GetIssuesByColumn
-    @ColumnId BIGINT
-AS
-BEGIN
-	SET NOCOUNT ON
-
-    SELECT * FROM Issues WHERE ColumnId = @ColumnId;
-END
-GO
-
--- Re order issues in a column after an issue has been removed or moved out of the column, 
--- ensuring that the PositionInColumn values are contiguous and correctly reflect the new 
--- order of issues within the column.
-
-CREATE PROCEDURE dbo.Issue_ReorderInColumn
+CREATE PROCEDURE sp_Issues_ReorderInColumn
     @IssuePosition INT,
     @ColumnId BIGINT
 AS

@@ -7,13 +7,13 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Board.WepAPI.Controllers;
 
+[Authorize]
 [Route("api/[controller]")]
 [ApiController]
 public class IssuesController(
     IMediator mediator,
     ILogger<ColumnsController> logger) : ControllerBase
 {
-    [Authorize]
     [HttpPost]
     public async Task<ActionResult<IssueResponseDto>> Create(CreateIssueCommand command)
     {
@@ -22,7 +22,6 @@ public class IssuesController(
         return Ok(result);
     }
 
-    [Authorize]
     [HttpPut]
     public async Task<ActionResult<IssueResponseDto>> Update(UpdateIssueCommand command)
     {
@@ -31,7 +30,6 @@ public class IssuesController(
         return Ok(result);
     }
 
-    [Authorize]
     [HttpDelete]
     [Route("{id}")]
     public async Task<ActionResult<IssuesByColumnIdResponseDto>> Delete(int id)

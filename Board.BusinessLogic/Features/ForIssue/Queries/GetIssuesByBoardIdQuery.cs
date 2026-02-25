@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Board.BusinessLogic.Features.ForIssue.Queries;
 
-public record GetIssuesByBoardIdQuery(int Id) : IRequest<BoardHierarchyDto>;
+public record GetIssuesByBoardIdQuery(long Id) : IRequest<BoardHierarchyDto>;

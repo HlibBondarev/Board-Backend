@@ -125,12 +125,12 @@ public abstract class EntityRepositoryBase<TKey, TEntity>(IConfiguration configu
         using var connection = new SqlConnection(_connectionString);
 
         await connection.OpenAsync();
-        var entities = await connection.QueryFirstAsync<TEntity>(
+        var entity = await connection.QueryFirstAsync<TEntity>(
             sql: sql,
             param: dbArgs
         );
 
-        return entities;
+        return entity;
     }
 
     protected internal async Task<string?> ExecuteReaderAsync(

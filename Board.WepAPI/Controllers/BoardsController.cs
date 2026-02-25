@@ -3,7 +3,6 @@ using Board.BusinessLogic.DTOs.Columns;
 using Board.BusinessLogic.Features.ForBoards.Commands;
 using Board.BusinessLogic.Features.ForBoards.Queries;
 using Board.BusinessLogic.Features.ForColumn.Commands;
-using Board.BusinessLogic.Features.ForColumn.Queries;
 using Board.BusinessLogic.Features.ForIssue.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -29,7 +28,7 @@ public class BoardsController(
     }
 
     [HttpGet("{id}")]
-    public async Task<BoardHierarchyDto> GetBordById(int id)
+    public async Task<BoardHierarchyDto> GetBordById(long id)
     {
         logger.LogInformation("Start  GetBordById action in {BoardsController}.",
             typeof(BoardsController));
@@ -47,42 +46,17 @@ public class BoardsController(
         return Ok(result);
     }
 
-    //[AllowAnonymous]
-    //[HttpGet("{columnId}")]
-    //public async Task<ActionResult<ColumnResponseDto>> GetColumn(int columnId)
-    //{
-    //    var column = await mediator.Send(new GetColumnByIdQuery(columnId));
-    //    if (column == null)
-    //    {
-    //        return NotFound();
-    //    }
-
-    //    return column;
-    //}
-
-    [HttpPut("{columnId}")]
-    public async Task<ActionResult<ColumnResponseDto>> Update(int columnId, UpdateColumnCommand command)
+    [HttpPost("{boardId}/columns")]
+    public async Task<ActionResult<ColumnResponseDto>> AddColumn(int boardId, [FromBody] CreateColumnCommand command)
     {
-        var column = await mediator.Send(new GetColumnByIdQuery(columnId));
-        if (column == null)
-        {
-            return NotFound();
-        }
-        var savedColumn = await mediator.Send(command);
+        logger.LogInformation("Adding a new column to board {BoardId}", boardId);
 
-        return savedColumn;
-    }
+        // Use the 'with' keyword to create a new instance of the record 
+        // with the BoardId provided from the route segment
+        var finalCommand = command with { BoardId = boardId };
 
-    [HttpDelete("{columnId}")]
-    public async Task<IActionResult> Delete(int columnId)
-    {
-        var column = await mediator.Send(new GetColumnByIdQuery(columnId));
-        if (column == null)
-        {
-            return NotFound();
-        }
-        await mediator.Send(new DeleteColumnCommand(columnId));
+        var result = await mediator.Send(finalCommand);
 
-        return NoContent();
+        return Ok(result);
     }
 }

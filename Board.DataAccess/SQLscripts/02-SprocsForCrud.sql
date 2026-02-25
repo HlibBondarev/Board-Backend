@@ -316,18 +316,32 @@ END;
 GO
 
 -- --------------------------------------------------------------------------------------------
--- Columns table represents the columns within a board (e.g., To Do, In Progress, Done). 
--- Create a column within a board
+-- Create a column at the end of the board (calculates position based on existing columns)
 CREATE PROCEDURE sp_Columns_Create
     @Name NVARCHAR(50),
     @Description NVARCHAR(200),
-    @Position INT,
     @BoardId BIGINT
 AS
 BEGIN
-    SET NOCOUNT ON
+    SET NOCOUNT ON;
+
+    -- Calculate the next position for the new column starting from 0
+    DECLARE @NextPosition INT;
+    
+    -- If no columns exist, COALESCE/ISNULL will return -1, so +1 results in 0
+    -- Alternatively: if exists returns MAX + 1, if not returns 0
+    SELECT @NextPosition = CASE 
+        WHEN EXISTS (SELECT 1 FROM Columns WHERE BoardId = @BoardId) 
+        THEN (SELECT MAX(Position) + 1 FROM Columns WHERE BoardId = @BoardId)
+        ELSE 0 
+    END;
+
+    -- Insert the new column
     INSERT INTO Columns (Name, Description, Position, BoardId)
-    VALUES (@Name, @Description, @Position, @BoardId);
+    VALUES (@Name, @Description, @NextPosition, @BoardId);
+
+    -- Return the newly created record
+    -- Using the specific ID to ensure performance and accuracy
     SELECT * FROM Columns WHERE Id = SCOPE_IDENTITY();
 END;
 GO
@@ -361,20 +375,6 @@ BEGIN
     SELECT * FROM Columns;
 END;
 GO
-
--- Get all columns belonging to a specific User in the Board
--- CREATE PROCEDURE dbo.Column_GetColumnsByUser
---     @UserId VARCHAR(64)
--- AS
--- BEGIN
---     SET NOCOUNT ON; -- Prevents sending extra "rows affected" messages for speed
-   
---     SELECT Id, Name, Description, Position, UserId
---     FROM Columns
---     WHERE UserId = @UserId
---     ORDER BY Position;
--- END;
--- GO
 
 CREATE PROCEDURE sp_Columns_Any @Id BIGINT
 AS

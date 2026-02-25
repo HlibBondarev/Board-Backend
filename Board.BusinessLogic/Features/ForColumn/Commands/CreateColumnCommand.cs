@@ -10,17 +10,15 @@ public record CreateColumnCommand(
     [Required]
     [StringLength(50, MinimumLength = 3)]
     string Name,
-
     [Required]
     [StringLength(200, MinimumLength = 10)]
-    string Description,
+    string Description
+    ) : IRequest<ColumnResponseDto>
+{
+    // The ID is not part of the primary constructor to keep the JSON body clean
+    public int BoardId { get; init; }
+}
 
-    [Required]
-    int Position,
-
-    [Required]
-    long BoardId
-) : IRequest<ColumnResponseDto>;
 
 public static class CreateColumnCommandExtensions
 {
@@ -28,7 +26,6 @@ public static class CreateColumnCommandExtensions
     {
         Name = dto.Name,
         Description = dto.Description,
-        Position = dto.Position,
         BoardId = dto.BoardId
     };
 

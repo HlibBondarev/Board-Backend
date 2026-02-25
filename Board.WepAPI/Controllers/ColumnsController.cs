@@ -15,20 +15,11 @@ public class ColumnsController(
     ILogger<ColumnsController> logger) : ControllerBase
 {
     [AllowAnonymous]
-    [HttpGet]
-    public async Task<IEnumerable<ColumnWithIssuesAndUserResponseDto>> GetAllColumns()
-    {
-        logger.LogInformation("Start  GetAllColumns action in {ColumnsController}.",
-            typeof(ColumnsController));
-        var columns = await mediator.Send(new GetAllColumnsWithIssuesAndUserQuery());
-
-        return columns ?? [];
-    }
-
-    [AllowAnonymous]
     [HttpGet("{columnId}")]
     public async Task<ActionResult<ColumnResponseDto>> GetColumn(int columnId)
     {
+        logger.LogInformation("Start  GetColumn action in {ColumnsController}.",
+            typeof(ColumnsController));
         var column = await mediator.Send(new GetColumnByIdQuery(columnId));
         if (column == null)
         {
@@ -41,12 +32,9 @@ public class ColumnsController(
     [HttpPost]
     public async Task<ActionResult<ColumnResponseDto>> Create(CreateColumnCommand command)
     {
-        var createdColumn = await mediator.Send(command);
+        var result = await mediator.Send(command);
 
-        return CreatedAtAction(nameof(GetColumn), new
-        {
-            userId = createdColumn.Id
-        }, createdColumn);
+        return Ok(result);
     }
 
     [HttpPut("{columnId}")]

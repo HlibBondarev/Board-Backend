@@ -31,9 +31,6 @@ public static class SqlStatements
             @CreatedAt = @CreatedAt";
         public const string CreateWithAdmin =
             @"sp_CreateBoardWithAdmin";
-        //@"EXEC sp_CreateBoardWithAdmin
-        //@Title = @Title, @Description = @Description, 
-        //@CreatedAt = @CreatedAt, @UserId = @UserId";
         public const string GetById =
             @"EXEC sp_Boards_GetById @Id = @Id";
         public const string GetBoardsByUserId =
@@ -48,16 +45,14 @@ public static class SqlStatements
             @"EXEC sp_Boards_Update @Id = @Id, @Title = @Title, @Description = @Description";
         public const string Delete =
             @"EXEC sp_Boards_Delete @Id = @Id";
-
-        //public const string GetAllIssuesInBoard =
-        //    @$"{ForBoards.GetById}; {ForUsers.GetByBoardId}; {ForColumns.GetByBoardId}; ";
-
     }
 
     public static class ForColumns
     {
         public const string Create =
-            @"EXEC sp_Columns_Create @Name = @Name, @Description = @Description, @Position = @Position, @UserId = @UserId";
+            @"EXEC sp_Columns_Create 
+            @Name = @Name, @Description = @Description, 
+            @BoardId = @BoardId";
         public const string GetById =
             @"EXEC sp_Columns_GetById @Id = @Id";
         public const string GetByBoardId =

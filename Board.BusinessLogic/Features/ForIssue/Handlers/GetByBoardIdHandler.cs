@@ -19,11 +19,11 @@ public class GetByBoardIdHandler(
             typeof(DataAccess.Models.Board).Name, request.Id, typeof(GetByBoardIdHandler));
 
         // 1. Fetch raw JSON string from the repository
-        string? rawJson = await repository.GetBoardHierarchyRaw(request.Id);
+        string? rawJson = await repository.GetBoardHierarchyRaw(request.Id, request.UserId);
 
         _ = rawJson ?? throw new NotFoundException($"{typeof(DataAccess.Models.Board).Name} with Id = {request.Id} not found");
 
-        logger.LogInformation("Successfully completed executing GetByBoardIdQuery for {Board} with {Id} in {BoardRepository}.",
+        logger.LogInformation("Successfully completed executing GetBoardHierarchyRaw for {Board} with {Id} in {BoardRepository}.",
             typeof(DataAccess.Models.Board).Name, request.Id, typeof(IBoardRepository));
 
         try

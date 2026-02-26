@@ -82,6 +82,10 @@ public static class SqlStatements
             @Position = @Position";
         public const string Delete =
             @"EXEC sp_Columns_Delete @Id = @Id";
+        public const string ReorderColumnsInBoard =
+            @"EXEC sp_Columns_ReorderInBoard
+            @ColumnPosition = @ColumnPosition, 
+            @BoardId = @BoardId";
     }
 
     public static class ForIssues

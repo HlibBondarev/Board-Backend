@@ -20,32 +20,11 @@ public record UpdateIssueCommand(
     [DataType(DataType.Date)]
     DateTime? DueDate,
 
-    //[Required]
-    //DateTime CreatedAt,
-
-    //[Required]
-    //int PositionInColumn,
-
-    //[Required]
-    //long ColumnId,
-
-    //[Required]
-    //string CreatorId,
-
     string? AssigneeId
 ) : IRequest<IssueResponseDto>;
 
 public static class UpdateColumnCommandExtensions
 {
-    //public static Issue ToModel(this UpdateIssueCommand dto) => new()
-    //{
-    //    Id = dto.Id,
-    //    Title = dto.Title,
-    //    Description = dto.Description,
-    //    DueDate = dto.DueDate,
-    //    AssigneeId = dto.AssigneeId,
-    //};
-
     public static void SetToModel(this UpdateIssueCommand dto, Issue model)
     {
         model.Title = dto.Title;
@@ -53,7 +32,4 @@ public static class UpdateColumnCommandExtensions
         model.DueDate = dto.DueDate;
         model.AssigneeId = dto.AssigneeId;
     }
-
-    //public static List<Issue> ToModel(this IEnumerable<UpdateIssueCommand> list)
-    //    => list.MapToList(ToModel);
 }

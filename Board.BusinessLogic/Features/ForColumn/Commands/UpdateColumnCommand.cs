@@ -1,5 +1,4 @@
 ﻿using Board.BusinessLogic.DTOs.Columns;
-using Board.Common.Extensions;
 using Board.DataAccess.Models;
 using MediatR;
 using System.ComponentModel.DataAnnotations;
@@ -8,34 +7,25 @@ namespace Board.BusinessLogic.Features.ForColumn.Commands;
 
 public record UpdateColumnCommand(
     [Required]
-    long Id,
-
-    [Required]
     [StringLength(50, MinimumLength = 3)]
     string Name,
-
     [Required]
     [StringLength(200, MinimumLength = 10)]
-    string Description,
+    string Description
+    ) : IRequest<ColumnUpdateResponseDto>
+{
+    // The ID is not part of the primary constructor to keep the JSON body clean
+    public int Id { get; init; }
+}
 
-    [Required]
-    int Position,
-
-    [Required]
-    long BoardId
-    ) : IRequest<ColumnResponseDto>;
 
 public static class UpdateColumnCommandExtensions
 {
-    public static Column ToModel(this UpdateColumnCommand dto) => new()
+    public static Column SetToModel(this Column model, UpdateColumnCommand dto)
     {
-        Id = dto.Id,
-        Name = dto.Name,
-        Description = dto.Description,
-        Position = dto.Position,
-        BoardId = dto.BoardId
-    };
+        model.Name = dto.Name;
+        model.Description = dto.Description;
 
-    public static List<Column> ToModel(this IEnumerable<UpdateColumnCommand> list)
-        => list.MapToList(ToModel);
+        return model;
+    }
 }

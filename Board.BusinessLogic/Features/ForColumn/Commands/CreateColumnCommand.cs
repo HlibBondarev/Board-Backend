@@ -15,7 +15,7 @@ public record CreateColumnCommand(
     string Description
     ) : IRequest<ColumnResponseDto>
 {
-    // The ID is not part of the primary constructor to keep the JSON body clean
+    // The BoardID is not part of the primary constructor to keep the JSON body clean
     public int BoardId { get; init; }
 }
 

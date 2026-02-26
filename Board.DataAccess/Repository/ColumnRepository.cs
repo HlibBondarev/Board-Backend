@@ -38,4 +38,17 @@ public class ColumnRepository(IConfiguration configuration) : EntityRepositoryBa
         // Return null if the result is empty, otherwise return the full JSON string
         return string.IsNullOrWhiteSpace(jsonResult) ? null : jsonResult;
     }
+
+    public async Task<bool> ReorderColumnsInBoard(int columnPosition, long boardId)
+    {
+        var parameters = new Dictionary<string, object>
+        {
+            { "ColumnPosition", columnPosition },
+            { "BoardId", boardId }
+        };
+
+        await ExecuteCommandAsync(SqlStatements.ForColumns.ReorderColumnsInBoard, parameters);
+
+        return true;
+    }
 }

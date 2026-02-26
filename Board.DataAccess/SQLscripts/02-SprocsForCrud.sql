@@ -153,9 +153,9 @@ BEGIN
         -- Position 3: Done
         INSERT INTO Columns (Name, Description, Position, BoardId)
         VALUES 
-        (N'To Do', N'Tasks that are ready to be started', 1, @NewBoardId),
-        (N'In Progress', N'Tasks that are currently being worked on', 2, @NewBoardId),
-        (N'Done', N'Tasks that have been completed', 3, @NewBoardId);
+        (N'To Do', N'Tasks that are ready to be started', 0, @NewBoardId),
+        (N'In Progress', N'Tasks that are currently being worked on', 1, @NewBoardId),
+        (N'Done', N'Tasks that have been completed', 2, @NewBoardId);
 
         COMMIT TRANSACTION;
 
@@ -455,26 +455,22 @@ GO
 
 -- Get all issues for a specific board
 CREATE PROCEDURE sp_Issues_GetByBoardIdJson
-    @BoardId BIGINT
+    @BoardId BIGINT,
+    @UserId VARCHAR(64)
 AS
 BEGIN
     SET NOCOUNT ON;
 
-    -- Check if the board exists before processing
-    IF NOT EXISTS (SELECT 1 FROM Boards WHERE Id = @BoardId)
-    BEGIN
-        SELECT NULL AS BoardJson;
-        RETURN;
-    END
-
-    -- Constructing the hierarchy using Nested FOR JSON PATH
+    -- The INNER JOIN ensures that only members of the board can access the data.
+    -- If the user is not in BoardMembers for this BoardId, the result will be empty.
     SELECT 
         b.Id, 
         b.Title, 
         b.Description, 
         b.CreatedAt,
+        bm.Role as UserRole, -- Include the user's specific role for this board
         (
-            -- Subquery for Columns
+            -- Subquery for Columns associated with the Board
             SELECT 
                 c.Id, 
                 c.Name, 
@@ -507,12 +503,12 @@ BEGIN
             FOR JSON PATH
         ) AS Columns
     FROM Boards b
-    WHERE b.Id = @BoardId
+    INNER JOIN BoardMembers bm ON b.Id = bm.BoardId
+    WHERE b.Id = @BoardId AND bm.UserId = @UserId
     FOR JSON PATH, WITHOUT_ARRAY_WRAPPER;
 END;
 GO
 
--- GetAll
 CREATE PROCEDURE sp_Issues_GetAll
 AS
 BEGIN

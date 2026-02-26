@@ -28,12 +28,12 @@ public class BoardsController(
     }
 
     [HttpGet("{id}")]
-    public async Task<BoardHierarchyDto> GetBordById(long id)
+    public async Task<BoardHierarchyDto> GetBordById(long id, [FromQuery] string userId)
     {
         logger.LogInformation("Start  GetBordById action in {BoardsController}.",
             typeof(BoardsController));
 
-        var board = await mediator.Send(new GetIssuesByBoardIdQuery(id));
+        var board = await mediator.Send(new GetIssuesByBoardIdQuery(id, userId));
 
         return board;
     }

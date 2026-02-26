@@ -24,11 +24,12 @@ public class BoardRepository(IConfiguration configuration) : EntityRepositoryBas
     public async Task<bool> Delete(long id) =>
        await Delete(id, SqlStatements.ForBoards.Delete);
 
-    public async Task<string?> GetBoardHierarchyRaw(long boardId)
+    public async Task<string?> GetBoardHierarchyRaw(long boardId, string userId)
     {
         var parameters = new Dictionary<string, object>
         {
-            { "BoardId", boardId }
+            { "BoardId", boardId },
+            { "UserId", userId }
         };
 
         var jsonResult = await ExecuteReaderAsync(

@@ -38,8 +38,10 @@ public class DeleteHandler(
         }
         else
         {
-            logger.LogWarning("Failed to delete {Issue} with {Id} in {DeleteHandler}.",
+            logger.LogError("Failed to delete {Issue} with {Id} in {DeleteHandler}.",
                 typeof(Issue).Name, request.Id, typeof(DeleteHandler).Name);
+            throw new BadRequestException
+                ($"Failed to delete {typeof(Issue).Name} with {request.Id} in {typeof(DeleteHandler).Name}.");
         }
 
         // Reorder remaining issues in the column after deletion
@@ -49,9 +51,12 @@ public class DeleteHandler(
 
         if (!isReordered)
         {
-            logger.LogWarning(
+            logger.LogError(
                 "Failed to reorder {Issue}s in {Column} after deleting {Issue} with {Id} in {DeleteHandler}.",
                 typeof(Issue).Name, typeof(Column).Name, typeof(Issue).Name, request.Id, typeof(DeleteHandler).Name);
+            throw new BadRequestException
+                ($"Failed to reorder {typeof(Issue).Name}s after deleting {typeof(Issue).Name} with {request.Id} in {typeof(DeleteHandler).Name}.");
+
         }
 
         // 1. Fetch raw JSON string from the repository

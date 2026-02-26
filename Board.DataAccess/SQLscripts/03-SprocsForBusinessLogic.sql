@@ -105,6 +105,33 @@ BEGIN
 END
 GO
 
+-- Reorder columns in Board with id = BoardId
+CREATE PROCEDURE sp_Columns_ReorderInBoard
+    @ColumnPosition INT,
+    @BoardId BIGINT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRANSACTION;
+    BEGIN TRY
+        BEGIN
+        -- Moving forward (down): shift intermediate items back (up)
+        UPDATE Columns
+        SET Position = Position - 1
+        WHERE BoardId = @BoardId
+        AND Position > @ColumnPosition;
+        END
+    COMMIT TRANSACTION;
+    END TRY
+    
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
+        THROW;
+    END CATCH
+END
+GO
+
 -- Get all issues in Column with id = ColumnId
 CREATE PROCEDURE sp_Issues_GetByColumnIdWithUsersJson
     @ColumnId BIGINT

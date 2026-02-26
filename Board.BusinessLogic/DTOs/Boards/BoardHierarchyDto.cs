@@ -8,5 +8,6 @@ public class BoardHierarchyDto
     public string Title { get; set; } = null!;
     public string? Description { get; set; }
     public DateTime CreatedAt { get; set; }
+    public string UserRole { get; set; } = null!;
     public List<ColumnHierarchyDto> Columns { get; set; } = [];
 }

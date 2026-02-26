@@ -16,7 +16,6 @@ public record CreateBoardCommand(
 
     [Required]
     [MaxLength(64)]
-    //[property: JsonPropertyName("sub")]
     string UserId
 ) : IRequest<BoardCreateResponseDto>;
 

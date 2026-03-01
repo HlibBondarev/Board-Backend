@@ -50,13 +50,21 @@ public class BoardsController(
     public async Task<ActionResult<ColumnResponseDto>> AddColumn(int boardId, [FromBody] CreateColumnCommand command)
     {
         logger.LogInformation("Adding a new column to board {BoardId}", boardId);
-
-        // Use the 'with' keyword to create a new instance of the record 
-        // with the BoardId provided from the route segment
         var finalCommand = command with { BoardId = boardId };
 
         var result = await mediator.Send(finalCommand);
 
         return Ok(result);
+    }
+
+    [HttpPost("{boardId}/members")]
+    public async Task<ActionResult> AddUserToBoard(long boardId, [FromBody] AddUserToBoardCommand command)
+    {
+        logger.LogInformation("Adding the User to Board with id = {BoardId}", boardId);
+        var finalCommand = command with { BoardId = boardId };
+
+        await mediator.Send(finalCommand);
+
+        return Ok(new { message = "User added successfully" });
     }
 }

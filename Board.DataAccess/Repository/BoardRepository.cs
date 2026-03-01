@@ -55,6 +55,7 @@ public class BoardRepository(IConfiguration configuration) : EntityRepositoryBas
 
     public async Task<Models.Board> CreateWithAdmin(Models.Board board, string userId)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(userId, nameof(userId));
         var parameters = new Dictionary<string, object>
         {
             { "Title", board.Title },
@@ -64,5 +65,33 @@ public class BoardRepository(IConfiguration configuration) : EntityRepositoryBas
         };
 
         return await QueryFirstAsync(SqlStatements.ForBoards.CreateWithAdmin, parameters);
+    }
+
+    public async Task<bool> CheckBoardMemberExistence(long boardId, string email)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(email, nameof(email));
+
+        var parameters = new Dictionary<string, object>
+        {
+            { "BoardId", boardId } ,
+            { "Email", email }
+        };
+
+        return await ExecuteQueryAsync(SqlStatements.ForBoards.CheckBoardMemberExistence, parameters);
+    }
+
+    public async Task AddBoardMember(long boardId, string email, string role)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(email, nameof(email));
+        ArgumentException.ThrowIfNullOrEmpty(role, nameof(role));
+
+        var parameters = new Dictionary<string, object>
+        {
+            { "BoardId", boardId } ,
+            { "Email", email },
+            { "Role", role }
+        };
+
+        await ExecuteCommandAsync(SqlStatements.ForBoards.AddBoardMember, parameters);
     }
 }

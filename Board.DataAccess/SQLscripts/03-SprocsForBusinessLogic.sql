@@ -238,3 +238,62 @@ BEGIN
     END CATCH
 END;
 GO
+
+-- Remove the User as a member of the Board with a specific BoardId
+CREATE PROCEDURE sp_Boards_RemoveMember
+    @BoardId BIGINT,
+    @Email NVARCHAR(255)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        DECLARE @UserId VARCHAR(64);
+        DECLARE @UserRole NVARCHAR(20);
+
+        -- Find the user ID and their role on the specific board
+        SELECT @UserId = u.Id, @UserRole = bm.Role
+        FROM Users u
+        JOIN BoardMembers bm ON u.Id = bm.UserId
+        WHERE u.Email = @Email AND bm.BoardId = @BoardId;
+
+        -- If user is not found on this board, exit the procedure
+        IF @UserId IS NULL
+        BEGIN
+            ROLLBACK TRANSACTION;
+            RETURN;
+        END
+
+        -- Business rule: prevent deleting the last Admin
+        IF @UserRole = 'Admin'
+        BEGIN
+            DECLARE @AdminCount INT;
+            
+            SELECT @AdminCount = COUNT(*)
+            FROM BoardMembers
+            WHERE BoardId = @BoardId AND Role = 'Admin';
+
+            IF @AdminCount <= 1
+            BEGIN
+                RAISERROR('Cannot remove the last Admin from the board.', 16, 1);
+            END
+        END
+
+        -- Delete the member record
+        DELETE FROM BoardMembers
+        WHERE BoardId = @BoardId AND UserId = @UserId;
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        -- Rollback transaction if active
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+
+        -- Re-throw the error to the calling application
+        THROW;
+    END CATCH
+END;
+GO

@@ -63,6 +63,8 @@ public static class SqlStatements
            @"sp_Boards_CheckMemberExistence";
         public const string AddBoardMember =
            @"sp_Boards_AddMember";
+        public const string RemoveBoardMember =
+           @"sp_Boards_RemoveMember";
     }
 
     public static class ForColumns

@@ -43,8 +43,8 @@ public class IssuesController(
     [Route("{id}/move")]
     public async Task<ActionResult> MoveIssue(long id, [FromBody] MoveIssueRequestDto dto)
     {
-        logger.LogInformation("Start  moving {Issue} with {id} in MoveIssue action in {ColumnsController}.",
-            typeof(Issue), id, typeof(ColumnsController));
+        logger.LogInformation("Start  moving {Issue} with {id} in MoveIssue action in {IssuesController}.",
+            typeof(Issue), id, typeof(IssuesController));
 
         bool result = await mediator.Send(new MoveIssueCommand(id, dto.ColumnId, dto.Position));
 

@@ -161,3 +161,80 @@ BEGIN
     FOR JSON PATH;
 END
 GO
+
+-- Checks if the User is already a member of the Board with a specific BoardId 
+CREATE PROCEDURE sp_Boards_CheckMemberExistence
+    @BoardId BIGINT,
+    @Email NVARCHAR(255)
+AS
+BEGIN
+    -- Set NOCOUNT ON to prevent extra result sets
+    SET NOCOUNT ON;
+
+    -- Check for existence and return 1 (true) or 0 (false)
+    IF EXISTS (
+        SELECT 1 
+        FROM BoardMembers bm
+        JOIN Users u ON bm.UserId = u.Id
+        WHERE bm.BoardId = @BoardId AND u.Email = @Email
+    )
+    BEGIN
+        SELECT CAST(1 AS BIT) AS IsMember;
+    END
+    ELSE
+    BEGIN
+        SELECT CAST(0 AS BIT) AS IsMember;
+    END
+END;
+GO
+
+-- Adds the User as a member of the Board with a specific BoardId
+CREATE PROCEDURE sp_Boards_AddMember
+    @BoardId BIGINT,
+    @Email NVARCHAR(255),
+    @Role NVARCHAR(20)
+AS
+BEGIN
+    -- Set NOCOUNT ON to prevent extra result sets from interfering with SELECT statements.
+    SET NOCOUNT ON;
+
+    DECLARE @UserId VARCHAR(64);
+
+    -- Find the UserId associated with the provided email
+    SELECT @UserId = Id 
+    FROM Users 
+    WHERE Email = @Email;
+
+    -- Check if the user exists
+    IF @UserId IS NULL
+    BEGIN
+        RAISERROR('User with the specified email does not exist.', 16, 1);
+        RETURN;
+    END
+
+    -- Check if the board exists
+    IF NOT EXISTS (SELECT 1 FROM Boards WHERE Id = @BoardId)
+    BEGIN
+        RAISERROR('Board with the specified ID does not exist.', 16, 1);
+        RETURN;
+    END
+
+    -- Check if the user is already a member of the board
+    IF EXISTS (SELECT 1 FROM BoardMembers WHERE BoardId = @BoardId AND UserId = @UserId)
+    BEGIN
+        RAISERROR('User is already a member of this board.', 16, 1);
+        RETURN;
+    END
+
+    -- Insert the new board member
+    BEGIN TRY
+        INSERT INTO BoardMembers (BoardId, UserId, Role)
+        VALUES (@BoardId, @UserId, @Role);
+    END TRY
+    BEGIN CATCH
+        -- Handle potential errors during insertion (e.g., Role check constraint)
+        DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
+        RAISERROR(@ErrorMessage, 16, 1);
+    END CATCH
+END;
+GO

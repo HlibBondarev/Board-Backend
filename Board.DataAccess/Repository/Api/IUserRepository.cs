@@ -5,4 +5,5 @@ namespace Board.DataAccess.Repository.Api;
 
 public interface IUserRepository : IEntityRepositoryBase<string, User>
 {
+    Task<bool> UserEmailIsExists(string email);
 }

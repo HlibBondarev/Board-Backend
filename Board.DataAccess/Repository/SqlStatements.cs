@@ -28,6 +28,8 @@ public static class SqlStatements
             @DisplayName = @DisplayName";
         public const string Delete =
             @"EXEC sp_Users_Delete @Id = @Id";
+        public const string UserEmailIsExists =
+           @"sp_Users_EmailIsExists";
     }
 
     public static class ForBoards
@@ -57,6 +59,10 @@ public static class SqlStatements
             @Description = @Description";
         public const string Delete =
             @"EXEC sp_Boards_Delete @Id = @Id";
+        public const string CheckBoardMemberExistence =
+           @"sp_Boards_CheckMemberExistence";
+        public const string AddBoardMember =
+           @"sp_Boards_AddMember";
     }
 
     public static class ForColumns

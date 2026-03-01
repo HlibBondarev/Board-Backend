@@ -24,4 +24,16 @@ public class UserRepository(IConfiguration configuration) : EntityRepositoryBase
 
     public async Task<IEnumerable<User>> GetAll() =>
         await GetAll(SqlStatements.ForUsers.GetAll);
+
+    public async Task<bool> UserEmailIsExists(string email)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(email, nameof(email));
+
+        var parameters = new Dictionary<string, object>
+        {
+            { "Email", email }
+        };
+
+        return await ExecuteQueryAsync(SqlStatements.ForUsers.UserEmailIsExists, parameters);
+    }
 }

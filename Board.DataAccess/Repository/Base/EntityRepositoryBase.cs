@@ -97,21 +97,6 @@ public abstract class EntityRepositoryBase<TKey, TEntity>(IConfiguration configu
         return true;
     }
 
-    protected internal async Task QueryMultipleAsync(
-        string sql,
-        object? parameters,
-        Func<GridReader, Task> readFunc)
-    {
-        using var connection = new SqlConnection(_connectionString);
-        await connection.OpenAsync();
-
-        // QueryMultiple is the most efficient way to handle multiple result sets in Dapper
-        using var multi = await connection.QueryMultipleAsync(sql, parameters);
-
-        // Execute the provided async reading logic
-        await readFunc(multi);
-    }
-
     protected internal async Task<TEntity> QueryFirstAsync(
         string sql,
         Dictionary<string, object> parameters)
@@ -153,6 +138,34 @@ public abstract class EntityRepositoryBase<TKey, TEntity>(IConfiguration configu
         var finalJson = string.Concat(fragments);
 
         return string.IsNullOrWhiteSpace(finalJson) ? null : finalJson;
+    }
+
+    protected internal async Task<bool> ExecuteQueryAsync(
+    string sql,
+    Dictionary<string, object> parameters)
+    {
+        using var connection = new SqlConnection(_connectionString);
+
+        await connection.OpenAsync();
+
+        using var transaction = connection.BeginTransaction();
+        try
+        {
+            var result = await connection.QueryFirstAsync<bool>(
+            sql,
+            parameters,
+            commandType: CommandType.StoredProcedure,
+            transaction: transaction
+        );
+            transaction.Commit();
+
+            return result;
+        }
+        catch (Exception)
+        {
+            transaction.Rollback();
+            throw;
+        }
     }
 
     protected internal async Task ExecuteCommandAsync(

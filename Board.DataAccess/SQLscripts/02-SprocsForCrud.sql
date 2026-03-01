@@ -81,6 +81,16 @@ BEGIN
 END;
 GO
 
+-- Checks if the User with Email = @Email already exists in the Users table 
+CREATE PROCEDURE sp_Users_EmailIsExists 
+    @Email VARCHAR(64)
+AS
+BEGIN
+    SET NOCOUNT ON
+    SELECT CASE WHEN EXISTS (SELECT 1 FROM Users WHERE Email = @Email) THEN 1 ELSE 0 END;
+END;
+GO
+
 -- Update user display name and email
 CREATE PROCEDURE sp_Users_Update
     @Id VARCHAR(64),

@@ -47,7 +47,7 @@ public class BoardsController(
     }
 
     [HttpPost("{boardId}/columns")]
-    public async Task<ActionResult<ColumnResponseDto>> AddColumn(int boardId, [FromBody] CreateColumnCommand command)
+    public async Task<ActionResult<ColumnResponseDto>> AddColumnToBoard(int boardId, [FromBody] CreateColumnCommand command)
     {
         logger.LogInformation("Adding a new column to board {BoardId}", boardId);
         var finalCommand = command with { BoardId = boardId };
@@ -60,11 +60,26 @@ public class BoardsController(
     [HttpPost("{boardId}/members")]
     public async Task<ActionResult> AddUserToBoard(long boardId, [FromBody] AddUserToBoardCommand command)
     {
-        logger.LogInformation("Adding the User to Board with id = {BoardId}", boardId);
+        logger.LogInformation(
+            "Adding the User with email = {Email} to Board with id = {BoardId}",
+            command.Email, boardId);
         var finalCommand = command with { BoardId = boardId };
 
         await mediator.Send(finalCommand);
 
-        return Ok(new { message = "User added successfully" });
+        return Ok(new { message = "The User has been successfully added to the Board." });
+    }
+
+    [HttpDelete("{boardId}/members")]
+    public async Task<ActionResult> RemoveUserFromBoard(int boardId, [FromBody] RemoveUserFromBoardCommand command)
+    {
+        logger.LogInformation(
+            "Removing the User with email = {Email} from Board with id = {BoardId}",
+            command.Email, boardId);
+        var finalCommand = command with { BoardId = boardId };
+
+        await mediator.Send(finalCommand);
+
+        return Ok(new { message = "The User has been successfully removed from the Board." });
     }
 }

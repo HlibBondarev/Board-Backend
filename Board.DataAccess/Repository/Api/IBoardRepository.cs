@@ -9,4 +9,5 @@ public interface IBoardRepository : IEntityRepositoryBase<long, Models.Board>
     Task<Models.Board> CreateWithAdmin(Models.Board board, string userId);
     Task<bool> CheckBoardMemberExistence(long boardId, string email);
     Task AddBoardMember(long boardId, string email, string role);
+    Task RemoveBoardMember(long boardId, string email);
 }

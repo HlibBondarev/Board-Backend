@@ -3,14 +3,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Board.BusinessLogic.Features.ForBoards.Commands;
 
-public record AddUserToBoardCommand(
+public record RemoveUserFromBoardCommand(
     [Required]
     [EmailAddress]
-    string Email,
-
-    [Required]
-    [AllowedValues("Admin", "User", ErrorMessage = "Invalid role. Allowed values are: Admin, User")]
-    string Role)
+    string Email)
     : IRequest
 {
     [Required]

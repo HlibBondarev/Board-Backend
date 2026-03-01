@@ -94,4 +94,17 @@ public class BoardRepository(IConfiguration configuration) : EntityRepositoryBas
 
         await ExecuteCommandAsync(SqlStatements.ForBoards.AddBoardMember, parameters);
     }
+
+    public async Task RemoveBoardMember(long boardId, string email)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(email, nameof(email));
+
+        var parameters = new Dictionary<string, object>
+        {
+            { "BoardId", boardId } ,
+            { "Email", email }
+        };
+
+        await ExecuteCommandAsync(SqlStatements.ForBoards.RemoveBoardMember, parameters);
+    }
 }

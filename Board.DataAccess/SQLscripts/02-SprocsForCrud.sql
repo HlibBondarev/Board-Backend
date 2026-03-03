@@ -8,10 +8,14 @@ CREATE PROCEDURE sp_Users_Create
     @CreatedAt DATETIME2
 AS
 BEGIN
-    SET NOCOUNT ON
+    SET NOCOUNT ON;
+
+    -- Insert new user record using Auth0 ID as the primary key
     INSERT INTO Users (Id, Email, DisplayName, CreatedAt)
     VALUES (@Id, @Email, @DisplayName, @CreatedAt);
-    SELECT * FROM Users WHERE Id = SCOPE_IDENTITY();
+
+    -- Return the newly created user using the input @Id parameter 
+    SELECT * FROM Users WHERE Id = @Id;
 END;
 GO
 

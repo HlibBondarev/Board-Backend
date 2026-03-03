@@ -10,7 +10,7 @@ public class ColumnRepository(IConfiguration configuration) : EntityRepositoryBa
     public async Task<Column> Create(Column column) =>
         await CreateOrUpdate(column, SqlStatements.ForColumns.Create);
 
-    public async Task<Column> GetById(long id) =>
+    public async Task<Column?> GetById(long id) =>
         await GetById(id, SqlStatements.ForColumns.GetById);
 
     public async Task<IEnumerable<Column>> GetAll() =>

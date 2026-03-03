@@ -7,7 +7,7 @@ public interface IEntityRepositoryBase<TKey, TEntity>
    where TKey : IEquatable<TKey>
 {
     Task<TEntity> Create(TEntity entity);
-    Task<TEntity> GetById(TKey id);
+    Task<TEntity?> GetById(TKey id);
     Task<IEnumerable<TEntity>> GetAll();
     Task<bool> Any(TKey id);
     Task<TEntity> Update(TEntity entity);

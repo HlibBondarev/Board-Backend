@@ -17,7 +17,7 @@ public class UpdateHandler(
         logger.LogInformation("Start updating {Column} with {Id} in {UpdateHandler}.",
             typeof(Column).Name, request.Id, typeof(UpdateHandler));
 
-        Column column = await repository.GetById(request.Id);
+        var column = await repository.GetById(request.Id);
         _ = column ?? throw new BadRequestException($"{typeof(Column).Name} with Id = {request.Id} not found");
         column.SetToModel(request);
         var updatedColumn = await repository.Update(column);

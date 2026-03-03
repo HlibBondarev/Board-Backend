@@ -1,6 +1,7 @@
 ﻿using Board.BusinessLogic.DTOs.Users;
 using Board.BusinessLogic.Features.ForUser.Commands;
 using Board.BusinessLogic.Features.ForUser.Queries;
+using Board.DataAccess.Models;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,25 +11,28 @@ namespace Board.WepAPI.Controllers;
 [Authorize]
 [Route("api/[controller]")]
 [ApiController]
-public class UsersController(IMediator mediator, ILogger<UsersController> logger) : ControllerBase
+public class UsersController(
+    IMediator mediator,
+    ILogger<UsersController> logger) : ControllerBase
 {
-    private readonly IMediator _mediator = mediator;
-    private readonly ILogger<UsersController> _logger = logger;
-
-    [AllowAnonymous]
     [HttpGet]
     public async Task<IEnumerable<UserResponseDto>> GetAllUsers()
     {
-        var users = await _mediator.Send(new GetAllUsersQuery());
+        logger.LogInformation("Start  GetAllUsers action in {UsersController}.",
+            typeof(UsersController));
+
+        var users = await mediator.Send(new GetAllUsersQuery());
 
         return users ?? [];
     }
 
-    [AllowAnonymous]
-    [HttpGet("{userId}")]
-    public async Task<ActionResult<UserResponseDto>> GetUser(string userId)
+    [HttpGet("{id}")]
+    public async Task<ActionResult<UserResponseDto>> GetUserById(string id)
     {
-        var user = await _mediator.Send(new GetUserByIdQuery(userId));
+        logger.LogInformation("Start getting {User} with id={userId} in GetAllUsers action of {UsersController}.",
+            typeof(User), id, typeof(UsersController));
+
+        var user = await mediator.Send(new GetUserByIdQuery(id));
         if (user == null)
         {
             return NotFound();
@@ -40,38 +44,45 @@ public class UsersController(IMediator mediator, ILogger<UsersController> logger
     [HttpPost]
     public async Task<ActionResult<UserResponseDto>> Create(CreateUserCommand command)
     {
-        var createdUser = await _mediator.Send(command);
+        logger.LogInformation("Start creating a {user} in Create action in {UsersController}",
+            typeof(User).Name, typeof(UsersController).Name);
 
-        return CreatedAtAction(nameof(GetUser), new
-        {
-            userId = createdUser.Id
-        }, createdUser);
+        var result = await mediator.Send(command);
+
+        return Ok(result);
     }
 
     [Authorize(Policy = "MustBeThisUser")]
     [HttpPut("{userId}")]
     public async Task<ActionResult<UserResponseDto>> Update(string userId, UpdateUserCommand command)
     {
-        var user = await _mediator.Send(new GetUserByIdQuery(userId));
+        logger.LogInformation("Start updating the {user} with id={userId} in Update action in {UsersController}",
+            typeof(User).Name, userId, typeof(UsersController).Name);
+
+        var user = await mediator.Send(new GetUserByIdQuery(userId));
         if (user == null)
         {
             return NotFound();
         }
-        var savedUser = await _mediator.Send(command);
 
-        return savedUser;
+        var result = await mediator.Send(command);
+
+        return Ok(result);
     }
 
     [Authorize(Policy = "MustBeThisUser")]
     [HttpDelete("{userId}")]
     public async Task<IActionResult> Delete(string userId)
     {
-        var user = await _mediator.Send(new GetUserByIdQuery(userId));
+        logger.LogInformation("Start deleting the {user} with id={userId} in Delete action in {UsersController}",
+            typeof(User).Name, userId, typeof(UsersController).Name);
+
+        var user = await mediator.Send(new GetUserByIdQuery(userId));
         if (user == null)
         {
             return NotFound();
         }
-        await _mediator.Send(new DeleteUserCommand(userId));
+        await mediator.Send(new DeleteUserCommand(userId));
 
         return NoContent();
     }

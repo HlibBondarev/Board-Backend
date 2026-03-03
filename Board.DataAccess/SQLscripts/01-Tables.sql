@@ -11,7 +11,7 @@ GO
 CREATE TABLE Boards (
     Id BIGINT IDENTITY(1,1) PRIMARY KEY,
     Title NVARCHAR(100) NOT NULL CHECK (LEN(Title) >= 3),
-    Description NVARCHAR(500) NULL,
+    Description NVARCHAR(500) NOT NULL CHECK (LEN(Description) >= 10),
     CreatedAt DATETIME2 NOT NULL
 );
 GO

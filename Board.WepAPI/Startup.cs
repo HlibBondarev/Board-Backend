@@ -1,12 +1,15 @@
-﻿using Board.BusinessLogic.Services;
-using Board.BusinessLogic.Services.Api;
+﻿using Board.BusinessLogic.Features.ForBoards.Queries;
+using Board.Common.Services;
+using Board.Common.Services.Api;
 using Board.DataAccess.Repository;
 using Board.DataAccess.Repository.Api;
 using Board.WepAPI.Authorization;
+using Board.WepAPI.Filters;
 using Board.WepAPI.Middleware;
 using DbUp;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Scalar.AspNetCore;
 using Serilog;
 using Serilog.Exceptions;
@@ -24,14 +27,24 @@ public static class Startup
             .Enrich.FromLogContext()
             .Enrich.WithExceptionDetails());
 
-
         var services = builder.Services;
         var configuration = builder.Configuration;
         var connectionString = configuration.GetConnectionString("DefaultConnection");
         EnsureDatabase.For.SqlDatabase(connectionString);
 
-        services.AddExceptionHandler<GlobalExceptionHandler>();
+        services.AddControllers(options =>
+        {
+            options.Filters.Add<ValidationFilter>();
+        });
+
+        builder.Services.Configure<ApiBehaviorOptions>(options =>
+        {
+            // Disable the default automatic 400 response
+            options.SuppressModelStateInvalidFilter = true;
+        });
+
         services.AddProblemDetails();
+        services.AddExceptionHandler<GlobalExceptionHandler>();
 
         var upgrader = DeployChanges.To
             .SqlDatabase(connectionString, null)
@@ -48,9 +61,7 @@ public static class Startup
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         services.AddOpenApi();
 
-        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(ICurrentUser).Assembly));
-
-        services.AddControllers();
+        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetBoardsByUserIdQuery).Assembly));
 
         services.AddCors(options => options.AddPolicy("AllowReactApp", builder =>
             builder.AllowAnyMethod()
@@ -79,9 +90,9 @@ public static class Startup
         services.AddScoped<IAuthorizationHandler, MustBeThisUserHandler>();
         services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-        services.AddHttpClient<ICurrentUser, CurrentUser>(client =>
+        services.AddHttpClient<ICurrentUserService, CurrentUserService>(client =>
         {
-            var authority = configuration["Auth:Authority"];
+            var authority = configuration["Auth0:Authority"];
             _ = authority ?? throw new ArgumentNullException(nameof(authority));
             client.BaseAddress = new Uri($"{authority.TrimEnd('/')}/");
         });

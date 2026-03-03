@@ -11,13 +11,14 @@ public record CreateBoardCommand(
     string Title,
 
     [Required]
-    [MaxLength(500)]
-    string Description,
-
+    [StringLength(500, MinimumLength = 10)]
+    string Description
+) : IRequest<BoardCreateResponseDto>
+{
     [Required]
     [MaxLength(64)]
-    string UserId
-) : IRequest<BoardCreateResponseDto>;
+    public required string UserId;
+};
 
 public static class CreateBoardCommandExtensions
 {

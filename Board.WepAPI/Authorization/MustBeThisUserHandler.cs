@@ -7,6 +7,14 @@ public class MustBeThisUserHandler : AuthorizationHandler<MustBeThisUserRequirem
 {
     protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, MustBeThisUserRequirement requirement)
     {
+        if (context.User.Identity?.IsAuthenticated != true)
+        {
+            context.Fail();
+            return Task.CompletedTask;
+        }
+
+
+
         if (context.User.Identity?.IsAuthenticated == true)
         {
             var name = context.User.FindFirst(c => c.Type == ClaimTypes.Name)?.Value

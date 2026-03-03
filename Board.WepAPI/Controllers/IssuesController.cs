@@ -17,6 +17,9 @@ public class IssuesController(
     [HttpPost]
     public async Task<ActionResult<IssueResponseDto>> Create(CreateIssueCommand command)
     {
+        logger.LogInformation("Start  creating {Issue} in Create action in {IssuesController}.",
+            typeof(Issue), typeof(IssuesController));
+
         var result = await mediator.Send(command);
 
         return Ok(result);
@@ -25,6 +28,9 @@ public class IssuesController(
     [HttpPut]
     public async Task<ActionResult<IssueResponseDto>> Update(UpdateIssueCommand command)
     {
+        logger.LogInformation("Start  updating {Issue} with {id} in Update action in {IssuesController}.",
+            typeof(Issue), command.Id, typeof(IssuesController));
+
         var result = await mediator.Send(command);
 
         return Ok(result);
@@ -34,6 +40,9 @@ public class IssuesController(
     [Route("{id}")]
     public async Task<ActionResult<IssuesByColumnIdResponseDto>> Delete(int id)
     {
+        logger.LogInformation("Start  deleting {Issue} with {id} in Delete action in {IssuesController}.",
+            typeof(Issue), id, typeof(IssuesController));
+
         var result = await mediator.Send(new DeleteIssueCommand(id));
 
         return Ok(result);

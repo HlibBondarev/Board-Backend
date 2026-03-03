@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Board.BusinessLogic.Features.ForUser.Queries;
 
-public record GetUserByIdQuery(string Id) : IRequest<UserResponseDto>;
+public record GetUserByIdQuery(string Id) : IRequest<UserResponseDto?>;

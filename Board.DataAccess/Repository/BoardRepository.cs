@@ -9,7 +9,7 @@ public class BoardRepository(IConfiguration configuration) : EntityRepositoryBas
     public async Task<Models.Board> Create(Models.Board board) =>
         await CreateOrUpdate(board, SqlStatements.ForBoards.Create);
 
-    public async Task<Models.Board> GetById(long id) =>
+    public async Task<Models.Board?> GetById(long id) =>
         await GetById(id, SqlStatements.ForBoards.GetById);
 
     public async Task<IEnumerable<Models.Board>> GetAll() =>
@@ -39,7 +39,7 @@ public class BoardRepository(IConfiguration configuration) : EntityRepositoryBas
         return string.IsNullOrWhiteSpace(jsonResult) ? null : jsonResult;
     }
 
-    public async Task<string?> GetByUserId(string userId)
+    public async Task<string?> GetByUserIdRaw(string userId)
     {
         var parameters = new Dictionary<string, object>
         {

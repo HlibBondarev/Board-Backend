@@ -17,7 +17,7 @@ public class GetByUserIdHandler(
     {
         logger.LogInformation("Start executing GetByUserIdQuery for {Board} with {Id} in {GetByUserIdHandler}.",
             typeof(DataAccess.Models.Board).Name, request.Id, typeof(GetByUserIdHandler));
-        string? rawJson = await repository.GetByUserId(request.Id);
+        string? rawJson = await repository.GetByUserIdRaw(request.Id);
         logger.LogInformation("Successfully completed executing GetByIdUserQuery for {User} with {Id} in {BoardRepository}.",
             typeof(DataAccess.Models.Board).Name, request.Id, typeof(IBoardRepository));
 

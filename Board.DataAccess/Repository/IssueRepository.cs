@@ -13,7 +13,7 @@ public class IssueRepository(IConfiguration configuration) : EntityRepositoryBas
     public async Task<bool> Any(long id) =>
         await Any(id, SqlStatements.ForIssues.Any);
 
-    public async Task<Issue> GetById(long id) =>
+    public async Task<Issue?> GetById(long id) =>
         await GetById(id, SqlStatements.ForIssues.GetById);
 
     public async Task<Issue> Update(Issue issue) =>

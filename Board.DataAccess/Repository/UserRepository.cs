@@ -13,7 +13,7 @@ public class UserRepository(IConfiguration configuration) : EntityRepositoryBase
     public async Task<bool> Any(string id) =>
         await Any(id, SqlStatements.ForUsers.Any);
 
-    public async Task<User> GetById(string id) =>
+    public async Task<User?> GetById(string id) =>
         await GetById(id, SqlStatements.ForUsers.GetById);
 
     public async Task<User> Update(User user) =>

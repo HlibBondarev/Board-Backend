@@ -14,7 +14,6 @@ public record UpdateColumnCommand(
     string Description
     ) : IRequest<ColumnUpdateResponseDto>
 {
-    // The ID is not part of the primary constructor to keep the JSON body clean
     public int Id { get; init; }
 }
 

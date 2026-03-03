@@ -43,16 +43,15 @@ public abstract class EntityRepositoryBase<TKey, TEntity>(IConfiguration configu
         }
     }
 
-    protected internal async Task<TEntity> GetById(TKey id, string sql)
+    protected internal async Task<TEntity?> GetById(TKey id, string sql)
     {
         using var connection = new SqlConnection(_connectionString);
 
         await connection.OpenAsync();
-        var entity = await connection.QueryFirstAsync<TEntity>(
+        var entity = await connection.QueryFirstOrDefaultAsync<TEntity>(
             sql,
             new { Id = id }
         );
-        _ = entity ?? throw new NotFoundException($"{typeof(TEntity).Name} with Id = {id} not found");
 
         return entity;
     }

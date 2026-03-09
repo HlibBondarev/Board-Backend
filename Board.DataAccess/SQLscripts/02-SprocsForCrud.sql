@@ -8,86 +8,14 @@ CREATE PROCEDURE sp_Users_Create
     @CreatedAt DATETIME2
 AS
 BEGIN
-    SET NOCOUNT ON
+    SET NOCOUNT ON;
+
+    -- Insert new user record using Auth0 ID as the primary key
     INSERT INTO Users (Id, Email, DisplayName, CreatedAt)
     VALUES (@Id, @Email, @DisplayName, @CreatedAt);
-    SELECT * FROM Users WHERE Id = SCOPE_IDENTITY();
-END;
-GO
 
--- Get user details by Id
-CREATE PROCEDURE sp_Users_GetById
-    @Id VARCHAR(64)
-AS
-BEGIN
-    SET NOCOUNT ON
+    -- Return the newly created user using the input @Id parameter 
     SELECT * FROM Users WHERE Id = @Id;
-END;
-GO
-
--- Get all users for a specific board ordered by creation date
-CREATE PROCEDURE sp_Users_GetByBoardId
-    @BoardId BIGINT
-AS
-BEGIN
-    SET NOCOUNT ON
-    SELECT 
-        u.Id
-        ,u.Email
-        ,u.DisplayName
-        ,u.CreatedAt
-    FROM Users u
-    INNER JOIN BoardMembers bm ON u.Id = bm.UserId
-    WHERE bm.BoardId = @BoardId
-    ORDER BY u.CreatedAt DESC;
-END;
-GO
-
--- Get all users for a specific board with a role ordered by creation date
-CREATE PROCEDURE sp_Users_GetByBoardIdWithRole
-    @BoardId BIGINT
-AS
-BEGIN
-    SET NOCOUNT ON
-    SELECT 
-        u.Id
-        ,u.Email
-        ,u.DisplayName
-        ,u.CreatedAt
-        ,bm.Role
-    FROM Users u
-    INNER JOIN BoardMembers bm ON u.Id = bm.UserId
-    WHERE bm.BoardId = @BoardId
-    ORDER BY u.CreatedAt DESC;
-END;
-GO
-
--- GetAll
-CREATE PROCEDURE sp_Users_GetAll
-AS
-BEGIN
-	SET NOCOUNT ON
-    SELECT * FROM Users
-    ORDER BY CreatedAt;
-END;
-GO
-
--- Any
-CREATE PROCEDURE sp_Users_Any @Id VARCHAR(64)
-AS
-BEGIN
-    SET NOCOUNT ON
-    SELECT CASE WHEN EXISTS (SELECT 1 FROM Users WHERE Id = @Id) THEN 1 ELSE 0 END;
-END;
-GO
-
--- Checks if the User with Email = @Email already exists in the Users table 
-CREATE PROCEDURE sp_Users_EmailIsExists 
-    @Email VARCHAR(64)
-AS
-BEGIN
-    SET NOCOUNT ON
-    SELECT CASE WHEN EXISTS (SELECT 1 FROM Users WHERE Email = @Email) THEN 1 ELSE 0 END;
 END;
 GO
 
@@ -103,6 +31,47 @@ BEGIN
     SET Email = @Email, DisplayName = @DisplayName 
     WHERE Id = @Id;
     SELECT * FROM Users WHERE Id = @Id;
+END;
+GO
+
+-- Get user details by Id
+CREATE PROCEDURE sp_Users_GetById
+    @Id VARCHAR(64)
+AS
+BEGIN
+    SET NOCOUNT ON
+    SELECT * FROM Users WHERE Id = @Id;
+END;
+GO
+
+-- Gets Users by Email = @Email 
+CREATE PROCEDURE sp_Users_GetByEmail 
+    @Email VARCHAR(64)
+AS
+BEGIN
+    SET NOCOUNT ON
+    SELECT * FROM Users WHERE Email = @Email;
+
+END;
+GO
+
+-- GetAll
+CREATE PROCEDURE sp_Users_GetAll
+AS
+BEGIN
+	SET NOCOUNT ON
+    SELECT * FROM Users
+    ORDER BY CreatedAt;
+END;
+GO
+
+-- Exists
+CREATE PROCEDURE sp_Users_Exists 
+    @Id VARCHAR(64)
+AS
+BEGIN
+    SET NOCOUNT ON
+    SELECT CASE WHEN EXISTS (SELECT 1 FROM Users WHERE Id = @Id) THEN 1 ELSE 0 END;
 END;
 GO
 
@@ -134,11 +103,11 @@ GO
 
 -- Create a new board and assign the creating user as Admin, also creates default columns 
 -- (To Do, In Progress, Done)
-CREATE PROCEDURE sp_CreateBoardWithAdmin
+CREATE PROCEDURE sp_Boards_CreateWithAdmin
     @Title NVARCHAR(100),
     @Description NVARCHAR(500),
-    @UserId VARCHAR(64),
-    @CreatedAt DATETIME2 
+    @CreatedAt DATETIME2,
+    @UserId VARCHAR(64)
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -183,6 +152,21 @@ BEGIN
 END;
 GO
 
+-- Update board title and description
+CREATE PROCEDURE sp_Boards_Update
+    @Id BIGINT,
+    @Title NVARCHAR(100),
+    @Description NVARCHAR(500)
+AS
+BEGIN
+    SET NOCOUNT ON
+    UPDATE Boards 
+    SET Title = @Title, Description = @Description 
+    WHERE Id = @Id;
+    SELECT * FROM Boards WHERE Id = @Id;
+END;
+GO
+
 -- Get board details by Id
 CREATE PROCEDURE sp_Boards_GetById
     @Id BIGINT
@@ -190,24 +174,6 @@ AS
 BEGIN
     SET NOCOUNT ON
     SELECT * FROM Boards WHERE Id = @Id;
-END;
-GO
-
--- Get all boards for a specific user ordered by creation date
-CREATE PROCEDURE sp_Boards_GetByUserId
-    @UserId VARCHAR(64)
-AS
-BEGIN
-    SET NOCOUNT ON
-    SELECT 
-        b.Id
-        ,b.Title
-        ,b.Description
-        ,b.CreatedAt
-    FROM Boards b
-    INNER JOIN BoardMembers bm ON b.Id = bm.BoardId
-    WHERE bm.UserId = @UserId
-    ORDER BY b.CreatedAt DESC;
 END;
 GO
 
@@ -241,27 +207,13 @@ BEGIN
 END;
 GO
 
--- Any
-CREATE PROCEDURE sp_Boards_Any @Id VARCHAR(64)
+-- Exists
+CREATE PROCEDURE sp_Boards_Exists 
+    @Id VARCHAR(64)
 AS
 BEGIN
     SET NOCOUNT ON
     SELECT CASE WHEN EXISTS (SELECT 1 FROM Boards WHERE Id = @Id) THEN 1 ELSE 0 END;
-END;
-GO
-
--- Update board title and description
-CREATE PROCEDURE sp_Boards_Update
-    @Id BIGINT,
-    @Title NVARCHAR(100),
-    @Description NVARCHAR(500)
-AS
-BEGIN
-    SET NOCOUNT ON
-    UPDATE Boards 
-    SET Title = @Title, Description = @Description 
-    WHERE Id = @Id;
-    SELECT * FROM Boards WHERE Id = @Id;
 END;
 GO
 
@@ -275,54 +227,118 @@ BEGIN
 END;
 GO
 
--- --------------------------------------------------------------------------------------------
--- BoardMembers table manages user roles (Admin vs User) for each board. A user can have different 
--- roles in different boards.
--- Add a user to a board with a specific role
-CREATE PROCEDURE sp_BoardMembers_Create
-    @BoardId BIGINT,
-    @UserId VARCHAR(64),
-    @Role NVARCHAR(20)
-AS
-BEGIN
-    SET NOCOUNT ON
-    INSERT INTO BoardMembers (BoardId, UserId, Role)
-    VALUES (@BoardId, @UserId, @Role);
-END;
-GO
-
--- Get all members of a specific board
-CREATE PROCEDURE sp_BoardMembers_GetByBoardId
-    @BoardId BIGINT
-AS
-BEGIN
-    SET NOCOUNT ON
-    SELECT UserId, Role FROM BoardMembers WHERE BoardId = @BoardId;
-END;
-GO
-
--- Change user role within a board
-CREATE PROCEDURE sp_BoardMembers_UpdateRole
-    @BoardId BIGINT,
-    @UserId VARCHAR(64),
-    @Role NVARCHAR(20)
-AS
-BEGIN
-    SET NOCOUNT ON
-    UPDATE BoardMembers SET Role = @Role 
-    WHERE BoardId = @BoardId AND UserId = @UserId;
-END;
-GO
-
--- Remove a user from a board
-CREATE PROCEDURE sp_BoardMembers_Delete
+-- Checks if the User with a specific id is already a member of the Board 
+CREATE PROCEDURE sp_Boards_CheckMembershipByUserId
     @BoardId BIGINT,
     @UserId VARCHAR(64)
 AS
 BEGIN
-    SET NOCOUNT ON
-    DELETE FROM BoardMembers WHERE BoardId = @BoardId AND UserId = @UserId;
+    -- Set NOCOUNT to prevent extra result sets from interfering with SELECT
+    SET NOCOUNT ON;
+
+    -- Return 1 (true) if record exists, 0 (false) otherwise
+    SELECT 
+        CASE 
+            WHEN EXISTS (
+                SELECT 1 
+                FROM BoardMembers 
+                WHERE BoardId = @BoardId AND UserId = @UserId
+            ) THEN CAST(1 AS BIT)
+            ELSE CAST(0 AS BIT)
+        END AS IsMember;
+END
+GO
+
+-- Checks if the User with a specific email is already a member of the Board 
+CREATE PROCEDURE sp_Boards_CheckMembershipByEmail
+    @BoardId BIGINT,
+    @Email NVARCHAR(255)
+AS
+BEGIN
+    -- Set NOCOUNT ON to prevent extra result sets
+    SET NOCOUNT ON;
+
+    -- Check for existence and return 1 (true) or 0 (false)
+    IF EXISTS (
+        SELECT 1 
+        FROM BoardMembers bm
+        JOIN Users u ON bm.UserId = u.Id
+        WHERE bm.BoardId = @BoardId AND u.Email = @Email
+    )
+    BEGIN
+        SELECT CAST(1 AS BIT) AS IsMember;
+    END
+    ELSE
+    BEGIN
+        SELECT CAST(0 AS BIT) AS IsMember;
+    END
 END;
+GO
+
+-- Checks if the User with a specific email is already a member of the Board with a specific role
+CREATE PROCEDURE sp_Boards_CheckMembershipWithRoleByEmail
+    @BoardId BIGINT,
+    @Email NVARCHAR(255),
+    @Role NVARCHAR(20)
+AS
+BEGIN
+    -- Set NOCOUNT ON to prevent extra result sets
+    SET NOCOUNT ON;
+
+    -- Validate if the provided role is allowed
+    IF @Role NOT IN ('Admin', 'User')
+    BEGIN
+        RAISERROR('Invalid role. Allowed values are "Admin" or "User".', 16, 1);
+        RETURN;
+    END
+
+    -- Check for existence with specific BoardId, Email and Role
+    IF EXISTS (
+        SELECT 1 
+        FROM BoardMembers bm
+        JOIN Users u ON bm.UserId = u.Id
+        WHERE bm.BoardId = @BoardId 
+          AND u.Email = @Email
+          AND bm.Role = @Role -- Added filtering by the passed Role parameter
+    )
+    BEGIN
+        -- Return 1 (true) if match found
+        SELECT CAST(1 AS BIT) AS IsMember;
+    END
+    ELSE
+    BEGIN
+        -- Return 0 (false) if no match found
+        SELECT CAST(0 AS BIT) AS IsMember;
+    END
+END
+GO
+
+-- Check the User is board Admin
+CREATE PROCEDURE sp_Boards_CheckUserIsAdmin
+    @BoardId BIGINT,
+    @UserId VARCHAR(64)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Check if a record exists with the specified BoardId, UserId, and Admin role
+    IF EXISTS (
+        SELECT 1 
+        FROM BoardMembers 
+        WHERE BoardId = @BoardId 
+          AND UserId = @UserId 
+          AND Role = 'Admin'
+    )
+    BEGIN
+        -- Return 1 (true) if the user is an Admin
+        SELECT CAST(1 AS BIT) AS IsAdmin;
+    END
+    ELSE
+    BEGIN
+        -- Return 0 (false) otherwise
+        SELECT CAST(0 AS BIT) AS IsAdmin;
+    END
+END
 GO
 
 -- --------------------------------------------------------------------------------------------
@@ -366,17 +382,6 @@ BEGIN
 END;
 GO
 
--- Get all columns for a specific board ordered by position
-CREATE PROCEDURE sp_Columns_GetByBoardId
-    @BoardId BIGINT
-AS
-BEGIN
-    SET NOCOUNT ON
-    SELECT * FROM Columns 
-    WHERE BoardId = @BoardId ORDER BY Position;
-END;
-GO
-
 -- GetAll
 CREATE PROCEDURE sp_Columns_GetAll
 AS
@@ -386,7 +391,9 @@ BEGIN
 END;
 GO
 
-CREATE PROCEDURE sp_Columns_Any @Id BIGINT
+-- Exists
+CREATE PROCEDURE sp_Columns_Exists 
+    @Id BIGINT
 AS
 BEGIN
 	SET NOCOUNT ON
@@ -443,6 +450,26 @@ BEGIN
 END;
 GO
 
+-- Update issue details, assignee, or move to another column
+CREATE PROCEDURE sp_Issues_Update
+    @Id BIGINT,
+    @Title NVARCHAR(200),
+    @Description NVARCHAR(2000),
+    @DueDate DATETIME2,
+    @AssigneeId VARCHAR(64)
+AS
+BEGIN
+    SET NOCOUNT ON
+    UPDATE Issues
+    SET Title = @Title, 
+        Description = @Description, 
+        DueDate = @DueDate, 
+        AssigneeId = @AssigneeId
+    WHERE Id = @Id;
+    SELECT * FROM Issues WHERE Id = @Id;
+END;
+GO
+
 -- Get issue detailes by id
 CREATE PROCEDURE sp_Issues_GetById
     @Id BIGINT
@@ -453,13 +480,11 @@ BEGIN
 END
 GO
 
--- Get all issues in a specific column ordered by position
-CREATE PROCEDURE sp_Issues_GetByColumnId
-    @ColumnId BIGINT
+CREATE PROCEDURE sp_Issues_GetAll
 AS
 BEGIN
-    SET NOCOUNT ON
-    SELECT * FROM Issues WHERE ColumnId = @ColumnId ORDER BY PositionInColumn;
+	SET NOCOUNT ON
+    SELECT * FROM Issues ORDER BY ColumnId, PositionInColumn;
 END;
 GO
 
@@ -519,41 +544,53 @@ BEGIN
 END;
 GO
 
-CREATE PROCEDURE sp_Issues_GetAll
+-- Get all issues in a specific column ordered by position
+CREATE PROCEDURE sp_Issues_GetByColumnId
+    @ColumnId BIGINT
 AS
 BEGIN
-	SET NOCOUNT ON
-    SELECT * FROM Issues ORDER BY ColumnId, PositionInColumn;
+    SET NOCOUNT ON
+    SELECT * FROM Issues WHERE ColumnId = @ColumnId ORDER BY PositionInColumn;
 END;
 GO
 
--- Any
-CREATE PROCEDURE sp_Issues_Any @Id BIGINT
+-- Get all issues in Column with id = ColumnId
+CREATE PROCEDURE sp_Issues_GetByColumnIdWithUsersJson
+    @ColumnId BIGINT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Використовуємо SELECT для вибору полів, що відповідають вашому DTO
+    -- FOR JSON PATH автоматично серіалізує результат у JSON рядок
+    SELECT 
+        i.Id,
+        i.Title,
+        i.Description,
+        i.DueDate,
+        i.CreatedAt,
+        i.PositionInColumn,
+        i.ColumnId,
+        i.CreatorId,
+        u_creator.DisplayName AS CreatorName,
+        i.AssigneeId,
+        u_assignee.DisplayName AS AssigneeName
+    FROM Issues i
+    INNER JOIN Users u_creator ON i.CreatorId = u_creator.Id
+    LEFT JOIN Users u_assignee ON i.AssigneeId = u_assignee.Id
+    WHERE i.ColumnId = @ColumnId
+    ORDER BY i.PositionInColumn
+    FOR JSON PATH;
+END
+GO
+
+-- Exists
+CREATE PROCEDURE sp_Issues_Exists 
+    @Id BIGINT
 AS
 BEGIN
 	SET NOCOUNT ON
     SELECT CASE WHEN EXISTS (SELECT 1 FROM Issues WHERE Id = @Id) THEN 1 ELSE 0 END;
-END;
-GO
-
-
--- Update issue details, assignee, or move to another column
-CREATE PROCEDURE sp_Issues_Update
-    @Id BIGINT,
-    @Title NVARCHAR(200),
-    @Description NVARCHAR(2000),
-    @DueDate DATETIME2,
-    @AssigneeId VARCHAR(64)
-AS
-BEGIN
-    SET NOCOUNT ON
-    UPDATE Issues
-    SET Title = @Title, 
-        Description = @Description, 
-        DueDate = @DueDate, 
-        AssigneeId = @AssigneeId
-    WHERE Id = @Id;
-    SELECT * FROM Issues WHERE Id = @Id;
 END;
 GO
 
@@ -566,5 +603,4 @@ BEGIN
     DELETE FROM Issues WHERE Id = @Id;
 END;
 GO
-
 -- --------------------------------------------------------------------------------------------

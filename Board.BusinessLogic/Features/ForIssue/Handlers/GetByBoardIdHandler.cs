@@ -1,11 +1,11 @@
 ﻿using Board.BusinessLogic.DTOs.Boards;
 using Board.BusinessLogic.Features.ForIssue.Queries;
 using Board.Common.Exceptions;
+using Board.Common.Extensions;
 using Board.DataAccess.Repository.Api;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace Board.BusinessLogic.Features.ForIssue.Handlers;
 
@@ -19,7 +19,7 @@ public class GetByBoardIdHandler(
             typeof(DataAccess.Models.Board).Name, request.Id, typeof(GetByBoardIdHandler));
 
         // 1. Fetch raw JSON string from the repository
-        string? rawJson = await repository.GetBoardHierarchyRaw(request.Id, request.UserId);
+        string? rawJson = await repository.GetBoardHierarchyInJson(request.Id, request.UserId);
 
         _ = rawJson ?? throw new NotFoundException($"{typeof(DataAccess.Models.Board).Name} with Id = {request.Id} not found");
 
@@ -30,7 +30,8 @@ public class GetByBoardIdHandler(
         {
             // 2. Deserialize directly into the Business Layer DTO
             // This maintains clean architecture: Repository returns raw data, Service shapes it
-            var boardDto = JsonSerializer.Deserialize<BoardHierarchyDto>(rawJson, jsonOptions);
+            var boardDto = JsonSerializer.Deserialize<BoardHierarchyDto>(
+                rawJson, new JsonSerializerOptions().GetDefault());
 
             // 3. Ensure collections are not null for the UI convenience
             _ = boardDto ?? throw new InvalidOperationException(
@@ -50,11 +51,4 @@ public class GetByBoardIdHandler(
             throw new InvalidOperationException("Failed to process board data structure.", ex);
         }
     }
-
-    private static readonly JsonSerializerOptions jsonOptions = new()
-    {
-        PropertyNameCaseInsensitive = true,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-        NumberHandling = JsonNumberHandling.AllowReadingFromString
-    };
 }

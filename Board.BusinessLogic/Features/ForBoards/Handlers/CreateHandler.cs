@@ -16,6 +16,7 @@ public class CreateHandler(
     {
         logger.LogInformation("Start creating {Board} in {CreateHandler}.",
             typeof(DataAccess.Models.Board).Name, typeof(CreateHandler));
+
         DataAccess.Models.Board board = request.ToModel();
         DataAccess.Models.Board result = await repository.CreateWithAdmin(board, request.UserId);
         logger.LogInformation("Successfully completed creating {Board} with {Id} in {BoardRepository}.",

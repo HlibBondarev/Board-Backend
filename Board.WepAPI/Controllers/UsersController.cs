@@ -1,78 +1,84 @@
-﻿using Board.BusinessLogic.DTOs.Users;
-using Board.BusinessLogic.Features.ForUser.Commands;
-using Board.BusinessLogic.Features.ForUser.Queries;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Board.WepAPI.Controllers;
 
+// This controller is not currently used in the application, but may be used for administration in the future.
 [Authorize]
 [Route("api/[controller]")]
 [ApiController]
-public class UsersController(IMediator mediator, ILogger<UsersController> logger) : ControllerBase
+public class UsersController(
+    IMediator mediator,
+    ILogger<UsersController> logger) : ControllerBase
 {
-    private readonly IMediator _mediator = mediator;
-    private readonly ILogger<UsersController> _logger = logger;
+    //[HttpGet]
+    //public async Task<IEnumerable<UserResponseDto>> GetAllUsers()
+    //{
+    //    logger.LogInformation("Start  GetAllUsers action in {UsersController}.",
+    //        typeof(UsersController));
 
-    [AllowAnonymous]
-    [HttpGet]
-    public async Task<IEnumerable<UserResponseDto>> GetAllUsers()
-    {
-        var users = await _mediator.Send(new GetAllUsersQuery());
+    //    var users = await mediator.Send(new GetAllUsersQuery());
 
-        return users ?? [];
-    }
+    //    return users ?? [];
+    //}
 
-    [AllowAnonymous]
-    [HttpGet("{userId}")]
-    public async Task<ActionResult<UserResponseDto>> GetUser(string userId)
-    {
-        var user = await _mediator.Send(new GetUserByIdQuery(userId));
-        if (user == null)
-        {
-            return NotFound();
-        }
+    //[HttpGet("{id}")]
+    //public async Task<ActionResult<UserResponseDto>> GetUserById(string id)
+    //{
+    //    logger.LogInformation("Start getting {User} with id={userId} in GetAllUsers action of {UsersController}.",
+    //        typeof(User), id, typeof(UsersController));
 
-        return user;
-    }
+    //    var user = await mediator.Send(new GetUserByIdQuery(id));
+    //    if (user == null)
+    //    {
+    //        return NotFound();
+    //    }
 
-    [HttpPost]
-    public async Task<ActionResult<UserResponseDto>> Create(CreateUserCommand command)
-    {
-        var createdUser = await _mediator.Send(command);
+    //    return user;
+    //}
 
-        return CreatedAtAction(nameof(GetUser), new
-        {
-            userId = createdUser.Id
-        }, createdUser);
-    }
+    //[HttpPost]
+    //public async Task<ActionResult<UserResponseDto>> Create(CreateUserCommand command)
+    //{
+    //    logger.LogInformation("Start creating a {user} in Create action in {UsersController}",
+    //        typeof(User).Name, typeof(UsersController).Name);
 
-    [Authorize(Policy = "MustBeThisUser")]
-    [HttpPut("{userId}")]
-    public async Task<ActionResult<UserResponseDto>> Update(string userId, UpdateUserCommand command)
-    {
-        var user = await _mediator.Send(new GetUserByIdQuery(userId));
-        if (user == null)
-        {
-            return NotFound();
-        }
-        var savedUser = await _mediator.Send(command);
+    //    var result = await mediator.Send(command);
 
-        return savedUser;
-    }
+    //    return Ok(result);
+    //}
 
-    [Authorize(Policy = "MustBeThisUser")]
-    [HttpDelete("{userId}")]
-    public async Task<IActionResult> Delete(string userId)
-    {
-        var user = await _mediator.Send(new GetUserByIdQuery(userId));
-        if (user == null)
-        {
-            return NotFound();
-        }
-        await _mediator.Send(new DeleteUserCommand(userId));
+    //[HttpPut("{userId}")]
+    //public async Task<ActionResult<UserResponseDto>> Update(string userId, UpdateUserCommand command)
+    //{
+    //    logger.LogInformation("Start updating the {user} with id={userId} in Update action in {UsersController}",
+    //        typeof(User).Name, userId, typeof(UsersController).Name);
 
-        return NoContent();
-    }
+    //    var user = await mediator.Send(new GetUserByIdQuery(userId));
+    //    if (user == null)
+    //    {
+    //        return NotFound();
+    //    }
+
+    //    var result = await mediator.Send(command);
+
+    //    return Ok(result);
+    //}
+
+    //[HttpDelete("{userId}")]
+    //public async Task<IActionResult> Delete(string userId)
+    //{
+    //    logger.LogInformation("Start deleting the {user} with id={userId} in Delete action in {UsersController}",
+    //        typeof(User).Name, userId, typeof(UsersController).Name);
+
+    //    var user = await mediator.Send(new GetUserByIdQuery(userId));
+    //    if (user == null)
+    //    {
+    //        return NotFound();
+    //    }
+    //    await mediator.Send(new DeleteUserCommand(userId));
+
+    //    return NoContent();
+    //}
 }

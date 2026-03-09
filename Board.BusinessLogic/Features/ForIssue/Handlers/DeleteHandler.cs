@@ -1,12 +1,12 @@
 ﻿using Board.BusinessLogic.DTOs.Issues;
 using Board.BusinessLogic.Features.ForIssue.Commands;
 using Board.Common.Exceptions;
+using Board.Common.Extensions;
 using Board.DataAccess.Models;
 using Board.DataAccess.Repository.Api;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace Board.BusinessLogic.Features.ForIssue.Handlers;
 
@@ -60,9 +60,12 @@ public class DeleteHandler(
         }
 
         // 1. Fetch raw JSON string from the repository
-        string? rawJson = await columnRepository.GetIssuesInColumnRaw(columnId);
+        string? rawJson = await columnRepository.GetIssuesInColumnInJson(columnId);
 
-        _ = rawJson ?? throw new NotFoundException($"{typeof(Column)} with Id = {columnId} not found");
+        if (rawJson is null)
+        {
+            return new IssuesByColumnIdResponseDto(columnId, []);
+        }
 
         logger.LogInformation(
             "Successfully completed executing GetIssuesInColumnRaw  query for {Column} with {Id} in {ColumnRepository}.",
@@ -72,7 +75,8 @@ public class DeleteHandler(
         {
             // 2. Deserialize directly into the Business Layer DTO
             // This maintains clean architecture: Repository returns raw data, Service shapes it
-            var issuesInColumn = JsonSerializer.Deserialize<IEnumerable<IssueWithUserByColumnsResponseDto>>(rawJson, jsonOptions);
+            var issuesInColumn = JsonSerializer.Deserialize<IEnumerable<IssueWithUserByColumnsResponseDto>>(
+                rawJson, new JsonSerializerOptions().GetDefault());
 
             // 3. Ensure collections are not null for the UI convenience
             _ = issuesInColumn ?? throw new InvalidOperationException(
@@ -86,11 +90,4 @@ public class DeleteHandler(
                 $"Failed to process {typeof(IEnumerable<IssueWithUserByColumnsResponseDto>).Name} data structure.", ex);
         }
     }
-
-    private static readonly JsonSerializerOptions jsonOptions = new()
-    {
-        PropertyNameCaseInsensitive = true,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-        NumberHandling = JsonNumberHandling.AllowReadingFromString
-    };
 }

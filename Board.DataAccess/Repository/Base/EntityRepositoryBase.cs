@@ -1,5 +1,4 @@
-﻿using Board.Common.Exceptions;
-using Board.DataAccess.Models.Base;
+﻿using Board.DataAccess.Models.Base;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
@@ -8,15 +7,17 @@ using static Dapper.SqlMapper;
 
 namespace Board.DataAccess.Repository.Base;
 
-public abstract class EntityRepositoryBase<TKey, TEntity>(IConfiguration configuration)
+public abstract class EntityRepositoryBase<TKey, TEntity>(IConfiguration configuration) : IEntityRepositoryBase<TKey, TEntity>
     where TEntity : class, IKeyedEntity<TKey>, new()
     where TKey : IEquatable<TKey>
 {
     protected readonly string _connectionString = configuration["ConnectionStrings:DefaultConnection"]
         ?? throw new InvalidOperationException("DefaultConnection connection string is missing.");
 
-    protected internal async Task<TEntity> CreateOrUpdate(TEntity entity, string sql)
+    public async Task<TEntity> CreateOrUpdate(TEntity entity, string sql, Dictionary<string, object>? additionalParams = null)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(sql, nameof(sql));
+
         using (var connection = new SqlConnection(_connectionString))
         {
             await connection.OpenAsync();
@@ -25,10 +26,23 @@ public abstract class EntityRepositoryBase<TKey, TEntity>(IConfiguration configu
             {
                 try
                 {
+                    var parameters = new DynamicParameters();
+                    parameters.AddDynamicParams(entity);
+                    parameters.RemoveUnused = true;
+
+                    if (additionalParams != null)
+                    {
+                        foreach (var pair in additionalParams)
+                        {
+                            parameters.Add(pair.Key, pair.Value);
+                        }
+                    }
+
                     var newEntity = await connection.QueryFirstAsync<TEntity>(
-                        sql,
-                        entity,
-                        transaction: transaction
+                        sql: sql,
+                        param: parameters,
+                        transaction: transaction,
+                        commandType: CommandType.Text
                     );
                     transaction.Commit();
 
@@ -43,83 +57,54 @@ public abstract class EntityRepositoryBase<TKey, TEntity>(IConfiguration configu
         }
     }
 
-    protected internal async Task<TEntity> GetById(TKey id, string sql)
+    public async Task<TEntity?> GetById(TKey id, string procName)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(procName, nameof(procName));
+
         using var connection = new SqlConnection(_connectionString);
 
         await connection.OpenAsync();
-        var entity = await connection.QueryFirstAsync<TEntity>(
-            sql,
-            new { Id = id }
+        var entity = await connection.QueryFirstOrDefaultAsync<TEntity>(
+            sql: procName,
+            param: new { Id = id },
+            commandType: CommandType.StoredProcedure
         );
-        _ = entity ?? throw new NotFoundException($"{typeof(TEntity).Name} with Id = {id} not found");
 
         return entity;
     }
 
-    protected internal async Task<IEnumerable<TEntity>> GetAll(string sql)
+    public async Task<IEnumerable<TEntity>> GetAll(string procName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(procName, nameof(procName));
+
+        using var connection = new SqlConnection(_connectionString);
+
+        await connection.OpenAsync();
+        var entities = await connection.QueryAsync<TEntity>(
+            sql: procName,
+            param: null,
+            commandType: CommandType.StoredProcedure
+        );
+
+        return entities ?? [];
+    }
+
+    public async Task<IEnumerable<TEntity>> GetByPropValues(string procName, Dictionary<string, object> parameters)
     {
         using var connection = new SqlConnection(_connectionString);
 
         await connection.OpenAsync();
         var entities = await connection.QueryAsync<TEntity>(
-            sql: sql,
-            param: null
+            sql: procName,
+            param: parameters,
+            commandType: CommandType.StoredProcedure
         );
-        _ = entities ?? throw new NotFoundException($"{typeof(TEntity).Name}s not found");
 
         return entities;
     }
 
-    protected internal async Task<bool> Any(TKey id, string sql)
-    {
-        using var connection = new SqlConnection(_connectionString);
-
-        await connection.OpenAsync();
-        var isExists = await connection.QueryFirstAsync<bool>(
-            sql: sql,
-            param: new { Id = id }
-        );
-
-        return isExists;
-    }
-
-    protected internal async Task<bool> Delete(TKey id, string sql)
-    {
-        using var connection = new SqlConnection(_connectionString);
-
-        await connection.OpenAsync();
-        await connection.ExecuteAsync(
-            sql: sql,
-            param: new { Id = id }
-        );
-
-        return true;
-    }
-
-    protected internal async Task<TEntity> QueryFirstAsync(
-        string sql,
-        Dictionary<string, object> parameters)
-    {
-        var dbArgs = new DynamicParameters();
-        foreach (var pair in parameters)
-        {
-            dbArgs.Add(pair.Key, pair.Value);
-        }
-
-        using var connection = new SqlConnection(_connectionString);
-
-        await connection.OpenAsync();
-        var entity = await connection.QueryFirstAsync<TEntity>(
-            sql: sql,
-            param: dbArgs
-        );
-
-        return entity;
-    }
-
-    protected internal async Task<string?> ExecuteReaderAsync(
-    string sql,
+    public async Task<string?> GetDataInJson(
+    string procName,
     Dictionary<string, object> parameters)
     {
         // Use a local connection to ensure it stays open during the entire operation
@@ -129,7 +114,7 @@ public abstract class EntityRepositoryBase<TKey, TEntity>(IConfiguration configu
         // SQL Server returns FOR JSON results as a sequence of string fragments.
         // QueryAsync<string> will fetch all these fragments into a list.
         var fragments = await connection.QueryAsync<string>(
-            sql,
+            procName,
             parameters,
             commandType: CommandType.StoredProcedure
         );
@@ -140,36 +125,55 @@ public abstract class EntityRepositoryBase<TKey, TEntity>(IConfiguration configu
         return string.IsNullOrWhiteSpace(finalJson) ? null : finalJson;
     }
 
-    protected internal async Task<bool> ExecuteQueryAsync(
-    string sql,
-    Dictionary<string, object> parameters)
+    public async Task<bool> Exists(TKey id, string procName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(procName, nameof(procName));
+
+        using var connection = new SqlConnection(_connectionString);
+
+        await connection.OpenAsync();
+        var exists = await connection.QueryFirstAsync<bool>(
+            sql: procName,
+            param: new { Id = id },
+            commandType: CommandType.StoredProcedure
+        );
+
+        return exists;
+    }
+
+    public async Task<bool> Exists(
+        string procName,
+        Dictionary<string, object> parameters)
     {
         using var connection = new SqlConnection(_connectionString);
 
         await connection.OpenAsync();
 
-        using var transaction = connection.BeginTransaction();
-        try
-        {
-            var result = await connection.QueryFirstAsync<bool>(
-            sql,
-            parameters,
-            commandType: CommandType.StoredProcedure,
-            transaction: transaction
-        );
-            transaction.Commit();
-
-            return result;
-        }
-        catch (Exception)
-        {
-            transaction.Rollback();
-            throw;
-        }
+        var result = await connection.QueryFirstAsync<bool>(
+        procName,
+        parameters,
+        commandType: CommandType.StoredProcedure);
+        return result;
     }
 
-    protected internal async Task ExecuteCommandAsync(
-        string sql,
+    public async Task<bool> Delete(TKey id, string procName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(procName, nameof(procName));
+
+        using var connection = new SqlConnection(_connectionString);
+
+        await connection.OpenAsync();
+        await connection.ExecuteAsync(
+            sql: procName,
+            param: new { Id = id },
+            commandType: CommandType.StoredProcedure
+        );
+
+        return true;
+    }
+
+    public async Task ExecuteCommandInTransaction(
+        string procName,
         Dictionary<string, object> parameters)
     {
         var dbArgs = new DynamicParameters();
@@ -186,9 +190,10 @@ public abstract class EntityRepositoryBase<TKey, TEntity>(IConfiguration configu
             try
             {
                 await connection.ExecuteAsync(
-                    sql: sql,
+                    sql: procName,
                     param: dbArgs,
-                    transaction: transaction
+                    transaction: transaction,
+                    commandType: CommandType.StoredProcedure
                 );
                 transaction.Commit();
 

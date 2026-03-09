@@ -1,4 +1,5 @@
 ﻿using Board.Common.Exceptions;
+using Board.Common.Extensions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -64,29 +65,46 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
                 "Internal Server Error. Please try again later or contact support.")
         };
 
-        // Standardized error response (RFC 7807)
+        // 1. Extract and format validation errors if they exist
+        string? detailedMessage = null;
+
+        if (exception is ValidationException && exception.Data.Count > 0)
+        {
+            var errorList = new List<string>();
+            foreach (System.Collections.DictionaryEntry entry in exception.Data)
+            {
+                if (entry.Value is string[] messages)
+                {
+                    // Format each field as "Field: error1, error2"
+                    errorList.Add($"{entry.Key}: {string.Join(", ", messages)}");
+                }
+            }
+
+            // Join all field errors into one single string
+            if (errorList.Count != 0)
+            {
+                detailedMessage = string.Join(" | ", errorList);
+            }
+        }
+
+        // 2. Create ProblemDetails using the detailed message for 'Detail'
         var problemDetails = new ProblemDetails
         {
             Status = statusCode,
-            Title = GetTitleForStatus(statusCode),
-            Detail = exception.Message,
+            Title = statusCode.GetTitleForStatus(),
+            Detail = detailedMessage ?? exception.Message,
             Instance = $"{httpContext.Request.Method} {httpContext.Request.Path}"
         };
 
-        httpContext.Response.StatusCode = statusCode;
+        // 3. Keep the original 'errors' extension (optional, for future flexibility)
+        if (exception is ValidationException && exception.Data.Count > 0)
+        {
+            problemDetails.Extensions["errors"] = exception.Data;
+        }
 
+        httpContext.Response.StatusCode = statusCode;
         await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
 
-        // Return true to signal that the exception has been handled
         return true;
     }
-
-    private static string GetTitleForStatus(int statusCode) => statusCode switch
-    {
-        StatusCodes.Status400BadRequest => "Bad Request",
-        StatusCodes.Status401Unauthorized => "Unauthorized",
-        StatusCodes.Status403Forbidden => "Forbidden",
-        StatusCodes.Status404NotFound => "Not Found",
-        _ => "Internal Server Error"
-    };
 }

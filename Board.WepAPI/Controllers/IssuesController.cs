@@ -12,43 +12,47 @@ namespace Board.WepAPI.Controllers;
 [ApiController]
 public class IssuesController(
     IMediator mediator,
-    ILogger<ColumnsController> logger) : ControllerBase
+    ILogger<IssuesController> logger) : ControllerBase
 {
-    [HttpPost]
-    public async Task<ActionResult<IssueResponseDto>> Create(CreateIssueCommand command)
-    {
-        var result = await mediator.Send(command);
-
-        return Ok(result);
-    }
-
     [HttpPut]
-    public async Task<ActionResult<IssueResponseDto>> Update(UpdateIssueCommand command)
+    [Route("{issueId}")]
+    [Authorize(Policy = "MustBeIssueAssigneeOrAdminOrIssueAssigneeIsNull")]
+    public async Task<ActionResult<bool>> Update(long issueId, UpdateIssueCommand command)
     {
-        var result = await mediator.Send(command);
+        logger.LogInformation("Start  updating {Issue} with {id} in Update action in {IssuesController}.",
+            typeof(Issue).Name, command.IssueId, typeof(IssuesController).Name);
 
-        return Ok(result);
+        var finalCommand = command with { IssueId = issueId };
+
+        var isUpdated = await mediator.Send(finalCommand);
+
+        return Ok(isUpdated);
     }
 
     [HttpDelete]
-    [Route("{id}")]
-    public async Task<ActionResult<IssuesByColumnIdResponseDto>> Delete(int id)
+    [Route("{issueId}")]
+    [Authorize(Policy = "MustBeIssueCreatorOrAssigneeOrAdmin")]
+    public async Task<ActionResult<IssuesByColumnIdResponseDto>> Delete(long issueId)
     {
-        var result = await mediator.Send(new DeleteIssueCommand(id));
+        logger.LogInformation("Start  deleting {Issue} with {id} in Delete action in {IssuesController}.",
+            typeof(Issue).Name, issueId, typeof(IssuesController).Name);
+
+        var result = await mediator.Send(new DeleteIssueCommand(issueId));
 
         return Ok(result);
     }
 
     [HttpPatch]
-    [Route("{id}/move")]
-    public async Task<ActionResult> MoveIssue(long id, [FromBody] MoveIssueRequestDto dto)
+    [Route("{issueId}/move")]
+    [Authorize(Policy = "MustBeMemberOfBoard")]
+    public async Task<ActionResult> MoveIssue(long issueId, [FromBody] MoveIssueRequestDto dto)
     {
         logger.LogInformation("Start  moving {Issue} with {id} in MoveIssue action in {IssuesController}.",
-            typeof(Issue), id, typeof(IssuesController));
+            typeof(Issue).Name, issueId, typeof(IssuesController).Name);
 
-        bool result = await mediator.Send(new MoveIssueCommand(id, dto.ColumnId, dto.Position));
+        bool isMoved = await mediator.Send(new MoveIssueCommand(issueId, dto.ColumnId, dto.Position));
 
-        if (!result)
+        if (!isMoved)
         {
             return BadRequest();
         }

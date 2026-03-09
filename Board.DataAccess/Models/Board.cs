@@ -12,7 +12,8 @@ public class Board : IKeyedEntity<long>
     [StringLength(100, MinimumLength = 3)]
     public string Title { get; set; } = null!;
 
-    [MaxLength(500)]
+    [Required]
+    [StringLength(500, MinimumLength = 10)]
     public string? Description { get; set; }
 
     [Required]

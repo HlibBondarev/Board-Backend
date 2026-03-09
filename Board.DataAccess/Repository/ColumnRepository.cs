@@ -9,34 +9,38 @@ public class ColumnRepository(IConfiguration configuration) : EntityRepositoryBa
 {
     public async Task<Column> Create(Column column) =>
         await CreateOrUpdate(column, SqlStatements.ForColumns.Create);
+    public async Task<Column> Update(Column column) =>
+        await CreateOrUpdate(column, SqlStatements.ForColumns.Update);
 
-    public async Task<Column> GetById(long id) =>
+    public async Task<Column?> GetById(long id) =>
         await GetById(id, SqlStatements.ForColumns.GetById);
 
     public async Task<IEnumerable<Column>> GetAll() =>
         await GetAll(SqlStatements.ForColumns.GetAll);
 
-    public async Task<bool> Any(long id) =>
-        await Any(id, SqlStatements.ForColumns.Any);
-
-    public async Task<Column> Update(Column column) =>
-        await CreateOrUpdate(column, SqlStatements.ForColumns.Update);
+    public async Task<bool> Exists(long id) =>
+        await Exists(id, SqlStatements.ForColumns.Exists);
 
     public async Task<bool> Delete(long id) =>
        await Delete(id, SqlStatements.ForColumns.Delete);
 
-    public async Task<string?> GetIssuesInColumnRaw(long columnId)
+    public async Task<string?> GetIssuesInColumnInJson(long columnId)
     {
         var parameters = new Dictionary<string, object>
         {
             { "ColumnId", columnId }
         };
 
-        var jsonResult = await ExecuteReaderAsync(
-            SqlStatements.ForIssues.GetByColumnIdWithUsers, parameters);
+        var jsonResult = await GetDataInJson(
+            SqlStatements.ForIssues.GetByColumnIdWithUsersInJson, parameters);
 
         // Return null if the result is empty, otherwise return the full JSON string
         return string.IsNullOrWhiteSpace(jsonResult) ? null : jsonResult;
+    }
+
+    public async Task<long> GetBoardIdByColumnId(long columnId)
+    {
+        return (await GetById(columnId))!.BoardId;
     }
 
     public async Task<bool> ReorderColumnsInBoard(int columnPosition, long boardId)
@@ -47,7 +51,7 @@ public class ColumnRepository(IConfiguration configuration) : EntityRepositoryBa
             { "BoardId", boardId }
         };
 
-        await ExecuteCommandAsync(SqlStatements.ForColumns.ReorderColumnsInBoard, parameters);
+        await ExecuteCommandInTransaction(SqlStatements.ForColumns.ReorderColumnsInBoard, parameters);
 
         return true;
     }

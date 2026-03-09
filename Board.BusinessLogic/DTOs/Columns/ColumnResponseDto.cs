@@ -8,7 +8,7 @@ public record ColumnResponseDto(
     string Name,
     string Description,
     int Position,
-    long BorderId);
+    long BoardId);
 
 public static class ColumnResponseDtoExtensions
 {

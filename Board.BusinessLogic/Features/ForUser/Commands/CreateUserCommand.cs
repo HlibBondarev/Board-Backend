@@ -28,7 +28,7 @@ public static class CreateUserCommandExtensions
     {
         Id = dto.Id,
         Email = dto.Email,
-        DisplayName = dto.DisplayName,
+        DisplayName = dto.DisplayName ?? dto.Email,
         CreatedAt = DateTime.UtcNow
     };
     public static List<User> ToModel(this IEnumerable<CreateUserCommand> list)

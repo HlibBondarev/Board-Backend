@@ -13,10 +13,10 @@ public record CreateColumnCommand(
     [Required]
     [StringLength(200, MinimumLength = 10)]
     string Description
-    ) : IRequest<ColumnResponseDto>
+    ) : IRequest<ColumnCreateResponseDto>
 {
     // The BoardID is not part of the primary constructor to keep the JSON body clean
-    public int BoardId { get; init; }
+    public long BoardId { get; init; }
 }
 
 

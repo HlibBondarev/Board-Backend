@@ -5,132 +5,107 @@ public static class SqlStatements
     public static class ForUsers
     {
         public const string Create =
-            @"EXEC sp_Users_Create 
-            @Id = @Id, @Email = @Email, 
-            @DisplayName = @DisplayName, 
-            @CreatedAt = @CreatedAt";
-        public const string GetById =
-            @"EXEC sp_Users_GetById 
-            @Id = @Id";
-        public const string GetByBoardId =
-            @"EXEC sp_Users_GetByBoardId 
-            @BoardId = @BoardId";
-        public const string GetByBoardIdWithRole =
-            @"EXEC sp_Users_GetByBoardId 
-            @BoardId = @BoardId";
-        public const string GetAll =
-            @"EXEC sp_Users_GetAll";
-        public const string Any =
-            @"EXEC sp_Users_Any";
+            @"EXEC sp_Users_Create
+            @Id, @Email, @DisplayName, @CreatedAt";
         public const string Update =
             @"EXEC sp_Users_Update 
-            @Id = @Id, @Email = @Email, 
-            @DisplayName = @DisplayName";
+            @Id, @Email, @DisplayName";
+        public const string GetById =
+            "sp_Users_GetById";
+        public const string GetByEmail =
+            "sp_Users_GetByEmail";
+        public const string GetAll =
+            "sp_Users_GetAll";
+        public const string Exists =
+            "sp_Users_Exists";
         public const string Delete =
-            @"EXEC sp_Users_Delete @Id = @Id";
-        public const string UserEmailIsExists =
-           @"sp_Users_EmailIsExists";
+            "sp_Users_Delete";
     }
 
     public static class ForBoards
     {
         public const string Create =
-            @"EXEC sp_Boards_Create 
-            @Id = @Id, @Title = @Title, 
-            @Description = @Description, 
-            @CreatedAt = @CreatedAt";
+            @"EXEC sp_Boards_Create
+            @Title, @Description, @CreatedAt";
         public const string CreateWithAdmin =
-            @"sp_CreateBoardWithAdmin";
-        public const string GetById =
-            @"EXEC sp_Boards_GetById 
-            @Id = @Id";
-        public const string GetBoardsByUserId =
-            @"EXEC sp_Boards_GetByUserId 
-            @UserId = @UserId";
-        public const string GetBoardsByUserIdWithRole =
-            @"sp_Boards_GetByUserIdWithRoleJson";
-        public const string GetAll =
-            @"EXEC sp_Boards_GetAll";
-        public const string Any =
-            @"EXEC sp_Boards_Any";
+            @"EXEC sp_Boards_CreateWithAdmin
+            @Title, @Description, @CreatedAt, @UserId";
         public const string Update =
-            @"EXEC sp_Boards_Update 
-            @Id = @Id, @Title = @Title, 
-            @Description = @Description";
+            @"EXEC sp_Boards_Update
+            @Id, @Title, @Description";
+        public const string GetById =
+            "sp_Boards_GetById";
+        public const string GetBoardsByUserIdWithRoleInJson =
+            "sp_Boards_GetByUserIdWithRoleJson";
+        public const string GetAll =
+            "sp_Boards_GetAll";
+        public const string Exists =
+            "sp_Boards_Exists";
         public const string Delete =
-            @"EXEC sp_Boards_Delete @Id = @Id";
-        public const string CheckBoardMemberExistence =
-           @"sp_Boards_CheckMemberExistence";
+            "sp_Boards_Delete";
+        public const string CheckBoardMembershipByUserId =
+            "sp_Boards_CheckMembershipByUserId";
+        public const string CheckBoardMembershipByEmail =
+            "sp_Boards_CheckMembershipByEmail";
+        public const string CheckBoardMembershipWithRoleByEmail =
+            "sp_Boards_CheckMembershipWithRoleByEmail";
+        public const string CheckUserIsBoardAdmin =
+            "sp_Boards_CheckUserIsAdmin";
+        // Storage procedures for Business Logic
         public const string AddBoardMember =
-           @"sp_Boards_AddMember";
+           "sp_Boards_AddMember";
         public const string RemoveBoardMember =
-           @"sp_Boards_RemoveMember";
+           "sp_Boards_RemoveMember";
     }
 
     public static class ForColumns
     {
         public const string Create =
-            @"EXEC sp_Columns_Create 
-            @Name = @Name, @Description = @Description, 
-            @BoardId = @BoardId";
-        public const string GetById =
-            @"EXEC sp_Columns_GetById 
-            @Id = @Id";
-        public const string GetByBoardId =
-            @"EXEC sp_Columns_GetByBoardId 
-            @BoardId = @BoardId";
-        public const string GetAll =
-            @"EXEC sp_Columns_GetAll";
-        public const string Any =
-            @"EXEC sp_Columns_Any";
+            @"EXEC sp_Columns_Create
+            @Name, @Description, @BoardId";
         public const string Update =
-            @"EXEC sp_Columns_Update 
-            @Id = @Id, @Name = @Name, 
-            @Description = @Description, 
-            @Position = @Position";
+            @"EXEC sp_Columns_Update
+            @Id, @Name, @Description, @Position";
+        public const string GetById =
+            "sp_Columns_GetById";
+        public const string GetAll =
+            "sp_Columns_GetAll";
+        public const string Exists =
+            "sp_Columns_Exists";
         public const string Delete =
-            @"EXEC sp_Columns_Delete @Id = @Id";
+            "sp_Columns_Delete";
+        // Storage procedures for Business Logic
         public const string ReorderColumnsInBoard =
-            @"EXEC sp_Columns_ReorderInBoard
-            @ColumnPosition = @ColumnPosition, 
-            @BoardId = @BoardId";
+            "sp_Columns_ReorderInBoard";
     }
 
     public static class ForIssues
     {
         public const string Create =
-            @"EXEC sp_Issues_Create 
-            @Title = @Title, @Description = @Description,
-            @DueDate = @DueDate, @CreatedAt = @CreatedAt,
-            @PositionInColumn = @PositionInColumn, @ColumnId = @ColumnId,
-            @CreatorId = @CreatorId, @AssigneeId = @AssigneeId";
+            @"EXEC sp_Issues_Create
+            @Title, @Description, @DueDate, @PositionInColumn,
+            @ColumnId, @CreatorId, @AssigneeId, @CreatedAt";
+        public const string Update =
+            @"EXEC sp_Issues_Update 
+            @Id, @Title, @Description, @DueDate, @AssigneeId";
         public const string GetById =
-            @"EXEC sp_Issues_GetById 
-            @Id = @Id";
-        public const string GetByColumnId =
-            @"EXEC sp_Issues_GetByColumnId 
-            @ColumnId = @ColumnId";
-        public const string GetByBoardId =
-            @"sp_Issues_GetByBoardIdJson";
-        public const string GetByColumnIdWithUsers =
-            @"sp_Issues_GetByColumnIdWithUsersJson";
+            "sp_Issues_GetById";
         public const string GetAll =
-            @"EXEC sp_Issues_GetAll";
-        public const string Any =
-            @"EXEC sp_Issues_Any";
-        public const string Update = @"EXEC sp_Issues_Update
-            @Id = @Id, @Title = @Title, @DueDate = @DueDate,
-            @Description = @Description, @AssigneeId = @AssigneeId";
+            "sp_Issues_GetAll";
+        public const string GetByBoardIdInJson =
+            "sp_Issues_GetByBoardIdJson";
+        public const string GetByColumnId =
+            "sp_Issues_GetByColumnId";
+        public const string GetByColumnIdWithUsersInJson =
+            "sp_Issues_GetByColumnIdWithUsersJson";
+        public const string Exists =
+            "sp_Issues_Exists";
         public const string Delete =
-            @"EXEC sp_Issues_Delete 
-            @Id = @Id";
-        public const string MoveIssue =
-            @"EXEC sp_Issues_Move
-            @IssueId = @IssueId, @TargetColumnId = @TargetColumnId,
-            @NewPosition = @NewPosition";
+            "sp_Issues_Delete";
+        // Storage procedures for Business Logic
         public const string ReorderIssuesInColumn =
-            @"EXEC sp_Issues_ReorderInColumn
-            @IssuePosition = @IssuePosition, 
-            @ColumnId = @ColumnId";
+            "sp_Issues_ReorderInColumn";
+        public const string MoveIssue =
+            "sp_Issues_Move";
     }
 }

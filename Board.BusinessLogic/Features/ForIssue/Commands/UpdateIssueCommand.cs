@@ -1,14 +1,10 @@
-﻿using Board.BusinessLogic.DTOs.Issues;
-using Board.DataAccess.Models;
+﻿using Board.DataAccess.Models;
 using MediatR;
 using System.ComponentModel.DataAnnotations;
 
 namespace Board.BusinessLogic.Features.ForIssue.Commands;
 
 public record UpdateIssueCommand(
-    [Required]
-    long Id,
-
     [Required]
     [StringLength(200, MinimumLength = 3)]
     string Title,
@@ -21,7 +17,11 @@ public record UpdateIssueCommand(
     DateTime? DueDate,
 
     string? AssigneeId
-) : IRequest<IssueResponseDto>;
+) : IRequest<bool>
+{
+    [Required]
+    public required long IssueId;
+}
 
 public static class UpdateColumnCommandExtensions
 {

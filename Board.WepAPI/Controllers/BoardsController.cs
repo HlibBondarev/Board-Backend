@@ -10,6 +10,7 @@ using Board.Common;
 using Board.Common.Extensions;
 using Board.Common.Services.Api;
 using Board.DataAccess.Models;
+using Board.WepAPI.Filters;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -26,9 +27,10 @@ public class BoardsController(
     ILogger<BoardsController> logger) : ControllerBase
 {
     [HttpGet]
-    public async Task<IEnumerable<BoardResponseDto>> GetBordsByUserId()
+    public async Task<BoardWithUserNameResponseDto> GetBordsByUserId()
     {
-        logger.LogInformation("Start  GetBordsByUserId action in {BoardsController}.",
+        logger.LogInformation(
+            "Start  GetBordsByUserId action in {BoardsController}.",
             typeof(BoardsController));
 
         var userClaims = await this.GetUserClaims(currentUserService);
@@ -38,23 +40,27 @@ public class BoardsController(
 
         if (user == null)
         {
-            await mediator.Send(new CreateUserCommand(userId, userClaims.Email, userClaims.Name));
-            return [];
+            var createdUser = await mediator.Send(new CreateUserCommand(userId, userClaims.Email, userClaims.Name));
+
+            return new BoardWithUserNameResponseDto(createdUser.DisplayName, []);
         }
 
-        var boards = await mediator.Send(new GetBoardsByUserIdQuery(userId));
+        var boards = await mediator.Send(new GetBoardsByUserIdQuery(userId)) ?? [];
 
-        return boards ?? [];
+        return new BoardWithUserNameResponseDto(user.DisplayName, [.. boards]);
     }
 
-    [HttpGet("{id}")]
-    public async Task<BoardHierarchyDto> GetBordById(long id)
+    [HttpGet("{boardId}")]
+    [ValidateId(nameof(boardId))]
+    [Authorize(Policy = "MustBeMemberOfBoard")]
+    public async Task<BoardHierarchyDto> GetBordById(long boardId)
     {
-        logger.LogInformation("Start  GetBordById action for {Board} with id={id} in {BoardsController}.",
-            typeof(DataAccess.Models.Board).Name, id, typeof(BoardsController).Name);
+        logger.LogInformation(
+            "Start  GetBordById action for {Board} with id={id} in {BoardsController}.",
+            typeof(DataAccess.Models.Board).Name, boardId, typeof(BoardsController).Name);
 
         string userId = await this.GetUserId(currentUserService);
-        var board = await mediator.Send(new GetIssuesByBoardIdQuery(id, userId));
+        var board = await mediator.Send(new GetIssuesByBoardIdQuery(boardId, userId));
 
         return board;
     }
@@ -62,7 +68,9 @@ public class BoardsController(
     [HttpPost]
     public async Task<ActionResult<BoardCreateResponseDto>> Create(CreateBoardCommand command)
     {
-        logger.LogInformation("Adding a new board in Create action of {BoardsController}", typeof(BoardsController).Name);
+        logger.LogInformation(
+            "Adding a new {board} in Create action of {BoardsController}",
+            typeof(DataAccess.Models.Board).Name, typeof(BoardsController).Name);
 
         string userId = await this.GetUserId(currentUserService);
         var finalCommand = command with { UserId = userId };
@@ -72,9 +80,13 @@ public class BoardsController(
     }
 
     [HttpPost("{boardId}/columns")]
-    public async Task<ActionResult<ColumnResponseDto>> AddColumnToBoard(int boardId, [FromBody] CreateColumnCommand command)
+    [ValidateId(nameof(boardId))]
+    [Authorize(Policy = "MustBeMemberOfBoard")]
+    public async Task<ActionResult<ColumnCreateResponseDto>> AddColumnToBoard(long boardId, [FromBody] CreateColumnCommand command)
     {
-        logger.LogInformation("Adding a new {column} to board with id={BoardId}", typeof(Column), boardId);
+        logger.LogInformation(
+            "Adding a new {column} to {board} with id={BoardId} in {BoardsController}",
+            typeof(Column).Name, typeof(DataAccess.Models.Board).Name, boardId, typeof(BoardsController).Name);
 
         var finalCommand = command with { BoardId = boardId };
         var result = await mediator.Send(finalCommand);
@@ -83,6 +95,8 @@ public class BoardsController(
     }
 
     [HttpPost("{boardId}/members")]
+    [ValidateId(nameof(boardId))]
+    [Authorize(Policy = "MustBeBoardAdmin")]
     public async Task<ActionResult> AddUserToBoard(long boardId, [FromBody] AddUserToBoardCommand command)
     {
         logger.LogInformation(
@@ -95,6 +109,8 @@ public class BoardsController(
     }
 
     [HttpDelete("{boardId}/members")]
+    [ValidateId(nameof(boardId))]
+    [Authorize(Policy = "MustBeBoardAdmin")]
     public async Task<ActionResult> RemoveUserFromBoard(int boardId, [FromBody] RemoveUserFromBoardCommand command)
     {
         logger.LogInformation(
@@ -105,5 +121,21 @@ public class BoardsController(
         await mediator.Send(finalCommand);
 
         return Ok(new { message = "The User has been successfully removed from the Board." });
+    }
+
+    [HttpDelete("{boardId}")]
+    [ValidateId(nameof(boardId))]
+    [Authorize(Policy = "MustBeBoardAdmin")]
+    public async Task<ActionResult> DeleteBordById(long boardId)
+    {
+        logger.LogInformation(
+            "Start  DeleteBordById action for {Board} with id={id} in {BoardsController}.",
+            typeof(DataAccess.Models.Board).Name, boardId, typeof(BoardsController).Name);
+
+        await mediator.Send(new DeleteBoardCommand(boardId));
+
+        string userId = await this.GetUserId(currentUserService);
+
+        return Ok(new { message = $"The Board has been successfully removed for User with id = {userId}" });
     }
 }

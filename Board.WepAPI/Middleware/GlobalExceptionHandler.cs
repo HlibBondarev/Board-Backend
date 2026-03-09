@@ -1,4 +1,5 @@
 ﻿using Board.Common.Exceptions;
+using Board.Common.Extensions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -80,7 +81,7 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
             }
 
             // Join all field errors into one single string
-            if (errorList.Any())
+            if (errorList.Count != 0)
             {
                 detailedMessage = string.Join(" | ", errorList);
             }
@@ -90,8 +91,7 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
         var problemDetails = new ProblemDetails
         {
             Status = statusCode,
-            Title = GetTitleForStatus(statusCode),
-            // Use the combined validation string, or fallback to the general exception message
+            Title = statusCode.GetTitleForStatus(),
             Detail = detailedMessage ?? exception.Message,
             Instance = $"{httpContext.Request.Method} {httpContext.Request.Path}"
         };
@@ -107,13 +107,4 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
 
         return true;
     }
-
-    private static string GetTitleForStatus(int statusCode) => statusCode switch
-    {
-        StatusCodes.Status400BadRequest => "Bad Request",
-        StatusCodes.Status401Unauthorized => "Unauthorized",
-        StatusCodes.Status403Forbidden => "Forbidden",
-        StatusCodes.Status404NotFound => "Not Found",
-        _ => "Internal Server Error"
-    };
 }

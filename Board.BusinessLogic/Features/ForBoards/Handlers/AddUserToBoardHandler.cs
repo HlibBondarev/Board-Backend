@@ -1,5 +1,4 @@
 ﻿using Board.BusinessLogic.Features.ForBoards.Commands;
-using Board.Common.Exceptions;
 using Board.DataAccess.Models;
 using Board.DataAccess.Repository.Api;
 using MediatR;
@@ -23,16 +22,16 @@ public class AddUserToBoardHandler(
 
         if (!isUserExists)
         {
-            throw new BadRequestException(
+            throw new InvalidOperationException(
                     $"The {typeof(User).Name} with email = {request.Email} doesn't exists in DB");
         }
 
-        bool isUserMemberOfBoard = await boardRepository.CheckBoardMemberExistence(request.BoardId, request.Email);
+        bool isUserMemberOfBoard = await boardRepository.CheckBoardMembershipWithRoleByEmail(request.BoardId, request.Email, request.Role);
 
         if (isUserMemberOfBoard)
         {
-            throw new BadRequestException(
-                $"The {typeof(User).Name} with email = {request.Email} is already a  member of the {typeof(DataAccess.Models.Board).Name} with Id = {request.BoardId}");
+            throw new InvalidOperationException(
+                $"The {typeof(User).Name} with email = {request.Email} has already had the role - '{request.Role}' in the {typeof(DataAccess.Models.Board).Name} with Id = {request.BoardId}");
         }
 
         await boardRepository.AddBoardMember(request.BoardId, request.Email, request.Role);

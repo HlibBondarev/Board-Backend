@@ -27,7 +27,7 @@ public class RemoveUserFromBoardHandler(
                     $"The {typeof(User).Name} with email = {request.Email} doesn't exists in DB");
         }
 
-        bool isUserMemberOfBoard = await boardRepository.CheckBoardMemberExistence(request.BoardId, request.Email);
+        bool isUserMemberOfBoard = await boardRepository.CheckBoardMembershipByEmail(request.BoardId, request.Email);
 
         if (!isUserMemberOfBoard)
         {

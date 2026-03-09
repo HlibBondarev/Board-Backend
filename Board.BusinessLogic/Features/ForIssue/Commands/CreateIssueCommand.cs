@@ -1,5 +1,4 @@
-﻿using Board.BusinessLogic.DTOs.Issues;
-using Board.Common.Extensions;
+﻿using Board.Common.Extensions;
 using Board.DataAccess.Models;
 using MediatR;
 using System.ComponentModel.DataAnnotations;
@@ -22,13 +21,14 @@ public record CreateIssueCommand(
     int PositionInColumn,
 
     [Required]
-    long ColumnId,
-
-    [Required]
     string CreatorId,
 
     string? AssigneeId
-) : IRequest<IssueResponseDto>;
+) : IRequest<long>
+{
+    // The ColumnId is not part of the primary constructor to keep the JSON body clean
+    public long ColumnId { get; init; }
+}
 
 public static class CreateIssueCommandExtensions
 {

@@ -10,20 +10,20 @@ public class UserRepository(IConfiguration configuration) : EntityRepositoryBase
     public async Task<User> Create(User user) =>
         await CreateOrUpdate(user, SqlStatements.ForUsers.Create);
 
-    public async Task<bool> Any(string id) =>
-        await Any(id, SqlStatements.ForUsers.Any);
+    public async Task<User> Update(User user) =>
+        await CreateOrUpdate(user, SqlStatements.ForUsers.Update);
 
     public async Task<User?> GetById(string id) =>
         await GetById(id, SqlStatements.ForUsers.GetById);
 
-    public async Task<User> Update(User user) =>
-        await CreateOrUpdate(user, SqlStatements.ForUsers.Update);
+    public async Task<IEnumerable<User>> GetAll() =>
+        await GetAll(SqlStatements.ForUsers.GetAll);
+
+    public async Task<bool> Exists(string id) =>
+        await Exists(id, SqlStatements.ForUsers.Exists);
 
     public async Task<bool> Delete(string id) =>
        await Delete(id, SqlStatements.ForUsers.Delete);
-
-    public async Task<IEnumerable<User>> GetAll() =>
-        await GetAll(SqlStatements.ForUsers.GetAll);
 
     public async Task<bool> UserEmailIsExists(string email)
     {
@@ -34,6 +34,6 @@ public class UserRepository(IConfiguration configuration) : EntityRepositoryBase
             { "Email", email }
         };
 
-        return await ExecuteQueryAsync(SqlStatements.ForUsers.UserEmailIsExists, parameters);
+        return (await GetByPropValues(SqlStatements.ForUsers.GetByEmail, parameters)).Any();
     }
 }

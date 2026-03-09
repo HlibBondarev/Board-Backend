@@ -132,71 +132,22 @@ BEGIN
 END
 GO
 
--- Get all issues in Column with id = ColumnId
-CREATE PROCEDURE sp_Issues_GetByColumnIdWithUsersJson
-    @ColumnId BIGINT
-AS
-BEGIN
-    SET NOCOUNT ON;
-
-    -- Використовуємо SELECT для вибору полів, що відповідають вашому DTO
-    -- FOR JSON PATH автоматично серіалізує результат у JSON рядок
-    SELECT 
-        i.Id,
-        i.Title,
-        i.Description,
-        i.DueDate,
-        i.CreatedAt,
-        i.PositionInColumn,
-        i.ColumnId,
-        i.CreatorId,
-        u_creator.DisplayName AS CreatorName,
-        i.AssigneeId,
-        u_assignee.DisplayName AS AssigneeName
-    FROM Issues i
-    INNER JOIN Users u_creator ON i.CreatorId = u_creator.Id
-    LEFT JOIN Users u_assignee ON i.AssigneeId = u_assignee.Id
-    WHERE i.ColumnId = @ColumnId
-    ORDER BY i.PositionInColumn
-    FOR JSON PATH;
-END
-GO
-
--- Checks if the User is already a member of the Board with a specific BoardId 
-CREATE PROCEDURE sp_Boards_CheckMemberExistence
-    @BoardId BIGINT,
-    @Email NVARCHAR(255)
-AS
-BEGIN
-    -- Set NOCOUNT ON to prevent extra result sets
-    SET NOCOUNT ON;
-
-    -- Check for existence and return 1 (true) or 0 (false)
-    IF EXISTS (
-        SELECT 1 
-        FROM BoardMembers bm
-        JOIN Users u ON bm.UserId = u.Id
-        WHERE bm.BoardId = @BoardId AND u.Email = @Email
-    )
-    BEGIN
-        SELECT CAST(1 AS BIT) AS IsMember;
-    END
-    ELSE
-    BEGIN
-        SELECT CAST(0 AS BIT) AS IsMember;
-    END
-END;
-GO
-
--- Adds the User as a member of the Board with a specific BoardId
+-- Adds the User as a member or updates their role if they are already a member
 CREATE PROCEDURE sp_Boards_AddMember
     @BoardId BIGINT,
     @Email NVARCHAR(255),
     @Role NVARCHAR(20)
 AS
 BEGIN
-    -- Set NOCOUNT ON to prevent extra result sets from interfering with SELECT statements.
+    -- Set NOCOUNT ON to prevent extra result sets
     SET NOCOUNT ON;
+
+    -- Validate if the provided role is allowed
+    IF @Role NOT IN ('Admin', 'User')
+    BEGIN
+        RAISERROR('Invalid role. Allowed values are "Admin" or "User".', 16, 1);
+        RETURN;
+    END
 
     DECLARE @UserId VARCHAR(64);
 
@@ -219,24 +170,28 @@ BEGIN
         RETURN;
     END
 
-    -- Check if the user is already a member of the board
-    IF EXISTS (SELECT 1 FROM BoardMembers WHERE BoardId = @BoardId AND UserId = @UserId)
-    BEGIN
-        RAISERROR('User is already a member of this board.', 16, 1);
-        RETURN;
-    END
-
-    -- Insert the new board member
     BEGIN TRY
-        INSERT INTO BoardMembers (BoardId, UserId, Role)
-        VALUES (@BoardId, @UserId, @Role);
+        -- Check if the user is already a member of the board
+        IF EXISTS (SELECT 1 FROM BoardMembers WHERE BoardId = @BoardId AND UserId = @UserId)
+        BEGIN
+            -- Update existing member's role
+            UPDATE BoardMembers
+            SET Role = @Role
+            WHERE BoardId = @BoardId AND UserId = @UserId;
+        END
+        ELSE
+        BEGIN
+            -- Insert the new board member
+            INSERT INTO BoardMembers (BoardId, UserId, Role)
+            VALUES (@BoardId, @UserId, @Role);
+        END
     END TRY
     BEGIN CATCH
-        -- Handle potential errors during insertion (e.g., Role check constraint)
+        -- Handle potential errors during execution
         DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
         RAISERROR(@ErrorMessage, 16, 1);
     END CATCH
-END;
+END
 GO
 
 -- Remove the User as a member of the Board with a specific BoardId

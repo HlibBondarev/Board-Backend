@@ -6,10 +6,13 @@ public interface IEntityRepositoryBase<TKey, TEntity>
    where TEntity : class, IKeyedEntity<TKey>, new()
    where TKey : IEquatable<TKey>
 {
-    Task<TEntity> Create(TEntity entity);
-    Task<TEntity?> GetById(TKey id);
-    Task<IEnumerable<TEntity>> GetAll();
-    Task<bool> Any(TKey id);
-    Task<TEntity> Update(TEntity entity);
-    Task<bool> Delete(TKey id);
+    Task<TEntity> CreateOrUpdate(TEntity entity, string sql, Dictionary<string, object>? additionalParams = null);
+    Task<TEntity?> GetById(TKey id, string procName);
+    Task<IEnumerable<TEntity>> GetAll(string procName);
+    Task<IEnumerable<TEntity>> GetByPropValues(string procName, Dictionary<string, object> parameters);
+    Task<string?> GetDataInJson(string procName, Dictionary<string, object> parameters);
+    Task<bool> Exists(TKey id, string procName);
+    Task<bool> Exists(string procName, Dictionary<string, object> parameters);
+    Task<bool> Delete(TKey id, string procedureName);
+    Task ExecuteCommandInTransaction(string procName, Dictionary<string, object> parameters);
 }

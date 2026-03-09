@@ -82,13 +82,22 @@ public static class Startup
         });
 
         services.AddHttpClient();
-        services.AddAuthorization(options =>
-          options.AddPolicy("MustBeThisUser", policy =>
-            policy.Requirements
-              .Add(new MustBeThisUserRequirement())));
+        services.AddAuthorizationBuilder()
+            .AddPolicy("MustBeMemberOfBoard", policy =>
+                policy.Requirements.Add(new MustBeMemberOfBoardRequirement()))
+            .AddPolicy("MustBeBoardAdmin", policy =>
+                policy.Requirements.Add(new MustBeBoardAdminRequirement()))
+            .AddPolicy("MustBeIssueCreatorOrAssigneeOrAdmin", policy =>
+                policy.Requirements.Add(new MustBeIssueCreatorOrAssigneeOrAdminRequirement()))
+            .AddPolicy("MustBeIssueAssigneeOrAdminOrIssueAssigneeIsNull", policy =>
+                policy.Requirements.Add(new MustBeIssueAssigneeOrAdminOrIssueAssigneeIsNullRequirement()));
 
-        services.AddScoped<IAuthorizationHandler, MustBeThisUserHandler>();
+        services.AddScoped<IAuthorizationHandler, MustBeMemberOfBoardHandler>();
+        services.AddScoped<IAuthorizationHandler, MustBeBoardAdminHandler>();
+        services.AddScoped<IAuthorizationHandler, MustBeIssueCreatorOrAssigneeOrAdminHandler>();
+        services.AddScoped<IAuthorizationHandler, MustBeIssueAssigneeOrAdminOrIssueAssigneeIsNullHandler>();
         services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+        services.AddSingleton<IAuthorizationMiddlewareResultHandler, BoardAppAuthorizationResultHandler>();
 
         services.AddHttpClient<ICurrentUserService, CurrentUserService>(client =>
         {

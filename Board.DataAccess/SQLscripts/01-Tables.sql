@@ -71,6 +71,7 @@ GO
 INSERT INTO BoardMembers (BoardId, UserId, Role) VALUES 
 (1, 'auth0|698b956080889e5401cef7c5', 'Admin'),
 (1, 'auth0|698b9bd69f764e2999518960', 'User'),
+(1, 'auth0|698b9bfb9f764e2999518993', 'User'),
 (2, 'auth0|698b9bd69f764e2999518960', 'Admin'); -- Ivan is Admin of the Marketing board
 GO
 

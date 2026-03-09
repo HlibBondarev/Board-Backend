@@ -1,5 +1,4 @@
-﻿using Board.BusinessLogic.DTOs.Columns;
-using Board.DataAccess.Models;
+﻿using Board.DataAccess.Models;
 using MediatR;
 using System.ComponentModel.DataAnnotations;
 
@@ -12,9 +11,9 @@ public record UpdateColumnCommand(
     [Required]
     [StringLength(200, MinimumLength = 10)]
     string Description
-    ) : IRequest<ColumnUpdateResponseDto>
+    ) : IRequest<bool>
 {
-    public int Id { get; init; }
+    public long ColumnId { get; init; }
 }
 
 

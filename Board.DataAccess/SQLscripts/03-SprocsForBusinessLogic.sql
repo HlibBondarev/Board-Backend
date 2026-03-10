@@ -132,14 +132,13 @@ BEGIN
 END
 GO
 
--- Adds the User as a member or updates their role if they are already a member
-CREATE PROCEDURE sp_Boards_AddMember
+---- Adds the User as a member or updates their role if they are already a member
+CREATE OR ALTER PROCEDURE sp_Boards_AddMember
     @BoardId BIGINT,
     @Email NVARCHAR(255),
     @Role NVARCHAR(20)
 AS
 BEGIN
-    -- Set NOCOUNT ON to prevent extra result sets
     SET NOCOUNT ON;
 
     -- Validate if the provided role is allowed
@@ -174,20 +173,39 @@ BEGIN
         -- Check if the user is already a member of the board
         IF EXISTS (SELECT 1 FROM BoardMembers WHERE BoardId = @BoardId AND UserId = @UserId)
         BEGIN
-            -- Update existing member's role
+            -- Logic to prevent demoting the last Admin
+            DECLARE @CurrentRole NVARCHAR(20);
+            SELECT @CurrentRole = Role FROM BoardMembers WHERE BoardId = @BoardId AND UserId = @UserId;
+
+            -- If changing from Admin to User, check the total number of admins
+            IF @CurrentRole = 'Admin' AND @Role = 'User'
+            BEGIN
+                DECLARE @AdminCount INT;
+                SELECT @AdminCount = COUNT(*) 
+                FROM BoardMembers 
+                WHERE BoardId = @BoardId AND Role = 'Admin';
+
+                IF @AdminCount <= 1
+                BEGIN
+                    RAISERROR('Cannot demote the last Admin of this board.', 16, 1);
+                    RETURN;
+                END
+            END
+
+            -- Update existing member's role if validation passed
             UPDATE BoardMembers
             SET Role = @Role
             WHERE BoardId = @BoardId AND UserId = @UserId;
         END
         ELSE
         BEGIN
-            -- Insert the new board member
+            -- Insert the new board member (no admin check needed for new entries)
             INSERT INTO BoardMembers (BoardId, UserId, Role)
             VALUES (@BoardId, @UserId, @Role);
         END
     END TRY
     BEGIN CATCH
-        -- Handle potential errors during execution
+        -- Catch and re-throw errors
         DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
         RAISERROR(@ErrorMessage, 16, 1);
     END CATCH

@@ -63,10 +63,12 @@ public static class Startup
 
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetBoardsByUserIdQuery).Assembly));
 
+        var allowedOrigins = configuration.GetSection("AllowedOrigins").Get<string[]>();
+
         services.AddCors(options => options.AddPolicy("AllowReactApp", builder =>
             builder.AllowAnyMethod()
                    .AllowAnyHeader()
-                   .WithOrigins("http://localhost:5173")
+                   .WithOrigins(allowedOrigins!)
                    .AllowCredentials()));
 
         services.AddAuthentication(options =>

@@ -7,7 +7,7 @@ public class User : IKeyedEntity<string>
 {
     [Required]
     [MaxLength(64)]
-    public string Id { get; init; } = null!;
+    public string Id { get; set; } = null!;
 
     [Required]
     [EmailAddress]

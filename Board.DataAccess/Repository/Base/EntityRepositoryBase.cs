@@ -206,4 +206,34 @@ public abstract class EntityRepositoryBase<TKey, TEntity>(IConfiguration configu
             }
         }
     }
+
+    public async Task<long> ExecuteQueryInTransaction(
+        string procName,
+        DynamicParameters parameters)
+    {
+        using (var connection = new SqlConnection(_connectionString))
+        {
+            await connection.OpenAsync();
+
+            using var transaction = connection.BeginTransaction();
+
+            try
+            {
+                long result = await connection.QuerySingleAsync<long>(
+                    sql: procName,
+                    param: parameters,
+                    transaction: transaction,
+                    commandType: CommandType.StoredProcedure
+                );
+                transaction.Commit();
+
+                return result;
+            }
+            catch (Exception)
+            {
+                transaction.Rollback();
+                throw;
+            }
+        }
+    }
 }

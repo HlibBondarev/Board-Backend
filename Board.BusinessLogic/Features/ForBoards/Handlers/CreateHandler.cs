@@ -15,12 +15,12 @@ public class CreateHandler(
     public async Task<BoardCreateResponseDto> Handle(CreateBoardCommand request, CancellationToken cancellationToken)
     {
         logger.LogInformation("Start creating {Board} in {CreateHandler}.",
-            typeof(DataAccess.Models.Board).Name, typeof(CreateHandler));
+            typeof(DataAccess.Models.Board).Name, typeof(CreateHandler).Name);
 
         DataAccess.Models.Board board = request.ToModel();
         DataAccess.Models.Board result = await repository.CreateWithAdmin(board, request.UserId);
         logger.LogInformation("Successfully completed creating {Board} with {Id} in {BoardRepository}.",
-            typeof(DataAccess.Models.Board).Name, result.Id, typeof(IIssueRepository));
+            typeof(DataAccess.Models.Board).Name, result.Id, typeof(IIssueRepository).Name);
 
         return result.ToDto();
     }

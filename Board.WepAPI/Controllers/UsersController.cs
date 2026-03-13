@@ -1,5 +1,4 @@
-﻿using MediatR;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Board.WepAPI.Controllers;
@@ -9,8 +8,9 @@ namespace Board.WepAPI.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 public class UsersController(
-    IMediator mediator,
-    ILogger<UsersController> logger) : ControllerBase
+    //IMediator mediator,
+    //ILogger<UsersController> logger
+    ) : ControllerBase
 {
     //[HttpGet]
     //public async Task<IEnumerable<UserResponseDto>> GetAllUsers()

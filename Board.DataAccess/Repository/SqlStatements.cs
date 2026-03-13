@@ -56,6 +56,8 @@ public static class SqlStatements
            "sp_Boards_AddMember";
         public const string RemoveBoardMember =
            "sp_Boards_RemoveMember";
+        public const string MigrateDemoBoard =
+           "sp_Boards_MigrateDemoBoard";
     }
 
     public static class ForColumns

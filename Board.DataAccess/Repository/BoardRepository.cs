@@ -1,6 +1,8 @@
 ﻿using Board.DataAccess.Repository.Api;
 using Board.DataAccess.Repository.Base;
+using Dapper;
 using Microsoft.Extensions.Configuration;
+using System.Data;
 
 namespace Board.DataAccess.Repository;
 
@@ -149,5 +151,59 @@ public class BoardRepository(IConfiguration configuration) : EntityRepositoryBas
         };
 
         await ExecuteCommandInTransaction(SqlStatements.ForBoards.RemoveBoardMember, parameters);
+    }
+
+    public async Task<long> MigrateBoard(Models.Board board, string userId)
+    {
+        // Prepare DataTable for Columns
+        var colTable = new DataTable();
+        colTable.Columns.Add("TempId", typeof(long));
+        colTable.Columns.Add("Name", typeof(string));
+        colTable.Columns.Add("Description", typeof(string));
+        colTable.Columns.Add("Position", typeof(int));
+
+        // Prepare DataTable for Issues
+        var issueTable = new DataTable();
+        issueTable.Columns.Add("TargetColumnTempId", typeof(long));
+        issueTable.Columns.Add("Title", typeof(string));
+        issueTable.Columns.Add("Description", typeof(string));
+        issueTable.Columns.Add("CreateAt", typeof(DateTime));
+        issueTable.Columns.Add("DueDate", typeof(DateTime));
+        issueTable.Columns.Add("PositionInColumn", typeof(long));
+        issueTable.Columns.Add("CreatorId", typeof(string));
+        issueTable.Columns.Add("AssigneeId", typeof(string));
+
+        // Add rows with values 
+        foreach (var col in board.Columns)
+        {
+            colTable.Rows.Add(
+                col.Id,
+                col.Name,
+                col.Description,
+                col.Position);
+
+            foreach (var issue in col.Issues)
+            {
+                issueTable.Rows.Add(
+                    issue.ColumnId,
+                    issue.Title,
+                    issue.Description,
+                    issue.CreatedAt,
+                    issue.DueDate,
+                    issue.PositionInColumn,
+                    issue.CreatorId,
+                    issue.AssigneeId);
+            }
+        }
+
+        var parameters = new DynamicParameters();
+        parameters.Add("@UserId", userId);
+        parameters.Add("@Title", board.Title);
+        parameters.Add("@Description", board.Description);
+        parameters.Add("@CreatedAt", board.CreatedAt);
+        parameters.Add("@Columns", colTable.AsTableValuedParameter("MigrateColumnType"));
+        parameters.Add("@Issues", issueTable.AsTableValuedParameter("MigrateIssueType"));
+
+        return await ExecuteQueryInTransaction(SqlStatements.ForBoards.MigrateDemoBoard, parameters);
     }
 }

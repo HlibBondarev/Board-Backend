@@ -1,4 +1,5 @@
 ﻿using Board.DataAccess.Models.Base;
+using Dapper;
 
 namespace Board.DataAccess.Repository.Base;
 
@@ -15,4 +16,5 @@ public interface IEntityRepositoryBase<TKey, TEntity>
     Task<bool> Exists(string procName, Dictionary<string, object> parameters);
     Task<bool> Delete(TKey id, string procedureName);
     Task ExecuteCommandInTransaction(string procName, Dictionary<string, object> parameters);
+    Task<long> ExecuteQueryInTransaction(string procName, DynamicParameters parameters);
 }

@@ -13,4 +13,5 @@ public interface IBoardRepository : IEntityRepository<long, Models.Board>
     Task AddBoardMember(long boardId, string email, string role);
     Task RemoveBoardMember(long boardId, string email);
     Task<bool> CheckUserIsBoardAdmin(long boardId, string userId);
+    Task<long> MigrateBoard(Models.Board board, string userId);
 }

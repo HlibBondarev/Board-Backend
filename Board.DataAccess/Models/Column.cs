@@ -5,7 +5,7 @@ namespace Board.DataAccess.Models;
 
 public class Column : IKeyedEntity<long>
 {
-    public long Id { get; init; }
+    public long Id { get; set; }
 
     [Required]
     [StringLength(50, MinimumLength = 3)]
@@ -20,4 +20,7 @@ public class Column : IKeyedEntity<long>
 
     [Required]
     public long BoardId { get; init; }
+
+    // Navigation property
+    public IEnumerable<Issue> Issues { get; set; } = [];
 }

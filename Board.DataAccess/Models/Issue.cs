@@ -6,7 +6,7 @@ namespace Board.DataAccess.Models;
 public class Issue : IKeyedEntity<long>
 {
     [Required]
-    public long Id { get; init; }
+    public long Id { get; set; }
 
     [Required]
     [StringLength(200, MinimumLength = 3)]

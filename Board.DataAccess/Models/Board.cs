@@ -6,7 +6,7 @@ namespace Board.DataAccess.Models;
 
 public class Board : IKeyedEntity<long>
 {
-    public long Id { get; init; }
+    public long Id { get; set; }
 
     [Required]
     [StringLength(100, MinimumLength = 3)]
@@ -18,4 +18,7 @@ public class Board : IKeyedEntity<long>
 
     [Required]
     public DateTime CreatedAt { get; set; }
+
+    // Navigation property
+    public IEnumerable<Column> Columns { get; set; } = [];
 }

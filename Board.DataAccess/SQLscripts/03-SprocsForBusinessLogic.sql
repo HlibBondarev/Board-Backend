@@ -270,3 +270,94 @@ BEGIN
     END CATCH
 END;
 GO
+
+-- Type for Columns
+CREATE TYPE MigrateColumnType AS TABLE (
+    TempId INT, -- Temporary ID to link issues to columns
+    Name NVARCHAR(50),
+    Description NVARCHAR(200),
+    Position INT
+);
+GO
+
+-- Type for Issues
+CREATE TYPE MigrateIssueType AS TABLE (
+    TargetColumnTempId INT, -- References TempId from MigrateColumnType
+    Title NVARCHAR(200),
+    Description NVARCHAR(2000),
+    CreatedAt DATETIME2,
+    DueDate DATETIME2,
+    PositionInColumn BIGINT,
+    CreatorId VARCHAR(64),
+    AssigneeId VARCHAR(64)
+);
+GO
+
+-- Gor migration demo-board to DB
+CREATE PROCEDURE sp_Boards_MigrateDemoBoard
+    @UserId VARCHAR(64),
+    @Title NVARCHAR(100),
+    @Description NVARCHAR(500),
+    @CreatedAt DATETIME2,
+    @Columns dbo.MigrateColumnType READONLY,
+    @Issues dbo.MigrateIssueType READONLY
+AS
+BEGIN
+    SET NOCOUNT ON;
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        -- 1. Insert Board
+        DECLARE @BoardId BIGINT;
+        INSERT INTO Boards (Title, Description, CreatedAt)
+        VALUES (@Title, @Description, @CreatedAt);
+        
+        SET @BoardId = SCOPE_IDENTITY();
+
+        -- 2. Insert Member (Admin)
+        INSERT INTO BoardMembers (BoardId, UserId, Role)
+        VALUES (@BoardId, @UserId, 'Admin');
+
+        -- 3. Cursor or Loop to insert Columns and their respective Issues
+        -- We use a mapping table to track generated IDs
+        DECLARE @ColTempId INT, @ColName NVARCHAR(50), @ColDesc NVARCHAR(200), @ColPos INT;
+        DECLARE @NewColumnId BIGINT;
+
+        DECLARE col_cursor CURSOR FOR 
+        SELECT TempId, Name, Description, Position FROM @Columns;
+
+        OPEN col_cursor;
+        FETCH NEXT FROM col_cursor INTO @ColTempId, @ColName, @ColDesc, @ColPos;
+
+        WHILE @@FETCH_STATUS = 0
+        BEGIN
+            -- Insert Column
+            INSERT INTO Columns (Name, Description, Position, BoardId)
+            VALUES (@ColName, @ColDesc, @ColPos, @BoardId);
+            
+            SET @NewColumnId = SCOPE_IDENTITY();
+
+            -- Insert Issues for this specific column
+            INSERT INTO Issues (Title, Description, DueDate, CreatedAt, PositionInColumn, ColumnId, CreatorId)
+            SELECT 
+                Title, Description, DueDate, CreatedAt, PositionInColumn,
+                @NewColumnId, @UserId
+            FROM @Issues
+            WHERE TargetColumnTempId = @ColTempId;
+
+            FETCH NEXT FROM col_cursor INTO @ColTempId, @ColName, @ColDesc, @ColPos;
+        END
+
+        CLOSE col_cursor;
+        DEALLOCATE col_cursor;
+
+        COMMIT TRANSACTION;
+
+        -- Return the new Board Id
+        SELECT @BoardId;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
+        THROW;
+    END CATCH
+END;

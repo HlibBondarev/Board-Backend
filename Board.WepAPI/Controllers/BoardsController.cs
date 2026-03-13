@@ -79,6 +79,21 @@ public class BoardsController(
         return Ok(result);
     }
 
+    [HttpPost("migrate")]
+    public async Task<ActionResult<int>> MigrateBoard([FromBody] MigrateBoardCommand command)
+    {
+        logger.LogInformation(
+                    "Migrating a new {board} in MigrateBoard action of {BoardsController}",
+                    typeof(DataAccess.Models.Board).Name, typeof(BoardsController).Name);
+
+        string userId = await this.GetUserId(currentUserService);
+        var finalCommand = command with { UserId = userId };
+        var result = await mediator.Send(finalCommand);
+
+        return Ok(result);
+    }
+
+
     [HttpPost("{boardId}/columns")]
     [ValidateId(nameof(boardId))]
     [Authorize(Policy = "MustBeMemberOfBoard")]

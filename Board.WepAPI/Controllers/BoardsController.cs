@@ -79,6 +79,20 @@ public class BoardsController(
         return Ok(result);
     }
 
+
+    [HttpPut("{boardId}")]
+    public async Task<ActionResult<BoardCreateResponseDto>> Update(long boardId, UpdateBoardCommand command)
+    {
+        logger.LogInformation(
+            "Updating {board} in Update action of {BoardsController}",
+            typeof(DataAccess.Models.Board).Name, typeof(BoardsController).Name);
+
+        var finalCommand = command with { BoardId = boardId };
+        var result = await mediator.Send(finalCommand);
+
+        return Ok(result);
+    }
+
     [HttpPost("migrate")]
     public async Task<ActionResult<int>> MigrateBoard([FromBody] MigrateBoardCommand command)
     {
@@ -92,7 +106,6 @@ public class BoardsController(
 
         return Ok(result);
     }
-
 
     [HttpPost("{boardId}/columns")]
     [ValidateId(nameof(boardId))]

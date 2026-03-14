@@ -1,5 +1,4 @@
 ﻿using Board.BusinessLogic.Features.ForColumn.Commands;
-using Board.Common.Exceptions;
 using Board.DataAccess.Models;
 using Board.DataAccess.Repository.Api;
 using MediatR;
@@ -17,7 +16,7 @@ public class UpdateHandler(
             typeof(Column).Name, request.ColumnId, typeof(UpdateHandler));
 
         var column = await repository.GetById(request.ColumnId);
-        _ = column ?? throw new BadRequestException($"{typeof(Column).Name} with Id = {request.ColumnId} not found");
+        _ = column ?? throw new InvalidOperationException($"{typeof(Column).Name} with Id = {request.ColumnId} not found");
 
         column.SetToModel(request);
 

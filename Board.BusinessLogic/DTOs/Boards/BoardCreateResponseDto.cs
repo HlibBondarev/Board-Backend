@@ -5,7 +5,7 @@ namespace Board.BusinessLogic.DTOs.Boards;
 public record BoardCreateResponseDto(
     long Id,
     string Title,
-    string? Description,
+    string Description,
     DateTime CreatedAt,
     string Role);
 

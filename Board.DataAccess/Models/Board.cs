@@ -14,7 +14,7 @@ public class Board : IKeyedEntity<long>
 
     [Required]
     [StringLength(500, MinimumLength = 10)]
-    public string? Description { get; set; }
+    public string Description { get; set; } = null!;
 
     [Required]
     public DateTime CreatedAt { get; set; }

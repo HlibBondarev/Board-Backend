@@ -338,10 +338,10 @@ BEGIN
             SET @NewColumnId = SCOPE_IDENTITY();
 
             -- Insert Issues for this specific column
-            INSERT INTO Issues (Title, Description, DueDate, CreatedAt, PositionInColumn, ColumnId, CreatorId)
+            INSERT INTO Issues (Title, Description, DueDate, CreatedAt, PositionInColumn, ColumnId, CreatorId, AssigneeId)
             SELECT 
                 Title, Description, DueDate, CreatedAt, PositionInColumn,
-                @NewColumnId, @UserId
+                @NewColumnId, CreatorId, AssigneeId
             FROM @Issues
             WHERE TargetColumnTempId = @ColTempId;
 
